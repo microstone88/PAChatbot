@@ -15,6 +15,20 @@ abstract class SqlQueryUtils extends Database {
 	
 	private static String sql = "";
 	
+	/**
+	 * Select all content from an existing table in a given database.
+	 * Only for debugging.
+	 * 
+	 * @param database a database
+	 * @param table a table in the given database
+	 * @return
+	 */
+	static QueryResult selectAllFromTable(DB database, TABLES table) {
+		sql = "SELECT * FROM " + table;
+		return Database.runQuery(database, sql);
+	}
+	
+	
 	static QueryResult queryForStdAnswer(Locale locale_lang, String std_question) {
 		sql = "SELECT `std_answer` FROM " + TABLES.basic_std_answers 
 				+ " WHERE `std_question` = \"" + std_question.toLowerCase(locale_lang) + "\"";
@@ -29,16 +43,6 @@ abstract class SqlQueryUtils extends Database {
 	}
 	
 	
-	
-	
-	/**
-	 * This is only for debugging.
-	 * 
-	 * @return the content in {@link TABLES#basic_std_answers}
-	 */
-	static QueryResult testQuery() {
-		String sql = "SELECT * FROM " + TABLES.basic_std_answers;
-		return Database.runQuery(sql);
-	}
 
+	
 }

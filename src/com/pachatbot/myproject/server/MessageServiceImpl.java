@@ -5,6 +5,8 @@ package com.pachatbot.myproject.server;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.pachatbot.myproject.client.MessageService;
+import com.pachatbot.myproject.server.Database.DB;
+import com.pachatbot.myproject.server.Database.TABLES;
 import com.pachatbot.myproject.shared.Bean.Message;
 import com.pachatbot.myproject.shared.Bean.QueryResult;
 
@@ -44,7 +46,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 	 */
 	@Override
 	public String connectToDB() {
-		QueryResult qr = SqlQueryUtils.testQuery();
+		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
 		if (qr.isEmpty()) return "[INFO] The returned QueryResult is empty.\n"
 				+ "SQL = " + qr.getSql();
 		if (qr.isNull()) return "[WARN] Multiple errors may occur! The returned QueryResult is null due to query failure."

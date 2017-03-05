@@ -1,5 +1,7 @@
 package com.pachatbot.myproject.server;
 
+import com.pachatbot.myproject.server.Database.DB;
+import com.pachatbot.myproject.server.Database.TABLES;
 import com.pachatbot.myproject.shared.Bean.QueryResult;
 
 public class Test {
@@ -19,11 +21,11 @@ public class Test {
 		
 //		MySqlUtils.testQuery();
 		
-//		QueryResult qr = SqlQueryUtils.testQuery();
+		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
 //		System.out.println(qr);
 		
 //		QueryResult qr = SqlQueryUtils.queryForStdAnswer(Locale.FRENCH, "something");
-		QueryResult qr = SqlQueryUtils.queryForClientInfoByPrimaryID(10);
+//		QueryResult qr = SqlQueryUtils.queryForClientInfoByPrimaryID(10);
 		
 //		QueryResult qr = new QueryResult();
 		

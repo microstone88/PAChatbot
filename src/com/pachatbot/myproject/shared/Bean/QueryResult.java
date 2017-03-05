@@ -3,6 +3,7 @@
  */
 package com.pachatbot.myproject.shared.Bean;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -11,13 +12,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * @author micro
  *
+ * This is
+ *
  */
-public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> implements IsSerializable {
+public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> implements Serializable {
 
 	/**
 	 * 
