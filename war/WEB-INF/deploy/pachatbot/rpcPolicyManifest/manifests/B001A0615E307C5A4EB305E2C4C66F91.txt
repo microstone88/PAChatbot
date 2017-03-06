@@ -1,2 +1,0 @@
-serviceClass: com.pachatbot.myproject.client.MessageService
-path: 03A1072DB1D7EBFDF35F74375B0D8FB3.gwt.rpc

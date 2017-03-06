@@ -22,20 +22,26 @@ public class Test {
 //		MySqlUtils.testQuery();
 		
 		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
-//		System.out.println(qr);
+		System.out.println(qr);
 		
 //		QueryResult qr = SqlQueryUtils.queryForStdAnswer(Locale.FRENCH, "something");
 //		QueryResult qr = SqlQueryUtils.queryForClientInfoByPrimaryID(10);
 		
 //		QueryResult qr = new QueryResult();
 		
-		System.out.println("isUniqueValue = " + qr.isUniqueValue());
-		System.out.println("isUniqueRow = " + qr.isUniqueRow());
-		System.out.println("isUniqueColumn = " + qr.isUniqueColumn());
-		System.out.println("isEmpty = " + qr.isEmpty());
-		System.out.println("isNull = " + qr.isNull());
+		QueryResult qr2 = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
+		System.out.println(qr2);
 		
-		System.out.println(qr);
+		QueryResult qr3 = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
+		System.out.println(qr3);
+		
+//		System.out.println("isUniqueValue = " + qr.isUniqueValue());
+//		System.out.println("isUniqueRow = " + qr.isUniqueRow());
+//		System.out.println("isUniqueColumn = " + qr.isUniqueColumn());
+//		System.out.println("isEmpty = " + qr.isEmpty());
+//		System.out.println("isNull = " + qr.isNull());
+//		
+//		System.out.println(qr);
 		
 //		QueryResult qr2 = new QueryResult();
 //		QueryResult qr3 = new QueryResult(qr2);

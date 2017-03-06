@@ -1,0 +1,2 @@
+serviceClass: com.pachatbot.myproject.client.SessionControl
+path: C69F39AE463F886FD20A0873B64F31F5.gwt.rpc

@@ -1,12 +1,96 @@
 /** Add css rules here for your application. */
 
+.dock td {
+  border: 1px solid #BBBBBB;
+  padding: 3px;
+}
+
+.sentBubble {
+  color: #3995d6;
+  padding: 1px;
+  /* background-color: #3995d6; */
+}
+
+.receivedBubble {
+  color: #5aa445;
+  padding: 1px;
+  /* background-color: #5aa445; */
+}
+
+.gwt-DecoratorPanel {
+}
+.gwt-DecoratorPanel .topCenter {
+  border-top: 1px solid #bbb;
+  line-height: 0px;
+}
+.gwt-DecoratorPanel .bottomCenter {
+  border-bottom: 1px solid #bbb;
+  line-height: 0px;
+}
+.gwt-DecoratorPanel .topCenterInner,
+.gwt-DecoratorPanel .bottomCenterInner {
+  height: 1px;
+  line-height: 0px;
+  font-size: 1px;
+}
+.gwt-DecoratorPanel .middleLeft {
+  border-left: 1px solid #bbb;
+}
+.gwt-DecoratorPanel .middleRight {
+  border-right: 1px solid #bbb;
+}
+.gwt-DecoratorPanel .middleLeftInner,
+.gwt-DecoratorPanel .middleRightInner {
+  width: 1px;
+  line-height: 1px;
+}
+.gwt-DecoratorPanel .topLeftInner,
+.gwt-DecoratorPanel .topRightInner,
+.gwt-DecoratorPanel .bottomLeftInner,
+.gwt-DecoratorPanel .bottomRightInner {
+  width: 5px;
+  height: 5px;
+  zoom: 1;
+  font-size: 1px;
+  overflow: hidden;
+}
+.gwt-DecoratorPanel .topLeft {
+  line-height: 0px;
+  background: url(images/circles.png) no-repeat 0px -6px;
+  -background: url(images/circles_ie6.png) no-repeat 0px -6px;
+}
+.gwt-DecoratorPanel .topRight {
+  line-height: 0px;
+  background: url(images/circles.png) no-repeat -5px -6px;
+  -background: url(images/circles_ie6.png) no-repeat -5px -6px;
+}
+.gwt-DecoratorPanel .bottomLeft {
+  line-height: 0px;
+  background: url(images/circles.png) no-repeat 0px -11px;
+  -background: url(images/circles_ie6.png) no-repeat 0px -11px;
+}
+.gwt-DecoratorPanel .bottomRight {
+  line-height: 0px;
+  background: url(images/circles.png) no-repeat -5px -11px;
+  -background: url(images/circles_ie6.png) no-repeat -5px -11px;
+}
+html>body .gwt-DecoratorPanel {
+}
+* html .gwt-DecoratorPanel .topLeftInner,
+* html .gwt-DecoratorPanel .topRightInner,
+* html .gwt-DecoratorPanel .bottomLeftInner,
+* html .gwt-DecoratorPanel .bottomRightInner {
+  width: 5px;
+  height: 5px;
+  overflow: hidden;
+}
 
 /** Example rules used by the template application (remove for your app) */
 h1 {
   font-size: 2em;
   font-weight: bold;
   color: #777777;
-  margin: 40px 0px 70px;
+  margin: 30px 0px 5px;
   text-align: center;
 }
 
