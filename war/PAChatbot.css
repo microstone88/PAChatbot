@@ -5,16 +5,67 @@
   padding: 3px;
 }
 
+input.normalSendButton, button.normalSendButton {
+  display: block;
+  font-size: 1.2em;
+}
+
+input.mobileSendButton, button.mobileSendButton {
+  display: block;
+  font-size: 1.4em;
+  font-weight: normal;
+}
+
+.normalDisplayText {
+	font-size: 1.0em
+}
+
+.mobileDisplayText {
+	font-size: 1.2em
+}
+
+.normalSentMessageText {
+	color: #3995d6;
+	font-size: 1.2em;
+}
+
+.normalReceivedMessageText {
+	color: #5aa445;
+	font-size: 1.2em;
+}
+
+.mobileSentMessageText {
+	color: #3995d6;
+	font-size: 1.4em;
+	font-weight: normal;
+}
+
+.mobileReceivedMessageText {
+	color: #5aa445;
+	font-size: 1.4em;
+	font-weight: normal;
+}
+
 .sentBubble {
-  color: #3995d6;
+  /* color: #3995d6; */
   padding: 1px;
   /* background-color: #3995d6; */
 }
 
 .receivedBubble {
-  color: #5aa445;
+  /* color: #5aa445; */
   padding: 1px;
   /* background-color: #5aa445; */
+}
+
+.customStackPanelHeader {
+	background-color: #62b0ff;
+	font-size: 1.4em;
+	font-weight: normal;
+	color: white;
+	padding-top: .3em;
+	padding-left: .6em;
+	padding-bottom: .3em;
 }
 
 .gwt-DecoratorPanel {
@@ -90,13 +141,8 @@ h1 {
   font-size: 2em;
   font-weight: bold;
   color: #777777;
-  margin: 30px 0px 5px;
+  margin: .5em 0em .5em;
   text-align: center;
-}
-
-.sendButton {
-  display: block;
-  font-size: 16pt;
 }
 
 /** Most GWT widgets already have a style name defined */

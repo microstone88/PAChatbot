@@ -49,8 +49,9 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
 		if (qr.isEmpty()) return "[INFO] The returned QueryResult is empty.\n"
 				+ "SQL = " + qr.getSql();
-		if (qr.isNull()) return "[WARN] Multiple errors may occur! The returned QueryResult is null due to query failure."
-				+ "Please verify the SQL statement and the database server.\n"
+		if (qr.isNull()) return "[WARN] The returned QueryResult is null due to query failure. "
+				+ "Multiple errors may occur! "
+				+ "Please verify both the MySQL server and the SQL statement.\n"
 				+ "SQL = " + qr.getSql();
 		else return qr.toString();
 	}
