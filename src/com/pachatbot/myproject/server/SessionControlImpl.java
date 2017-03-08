@@ -3,7 +3,6 @@ package com.pachatbot.myproject.server;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.pachatbot.myproject.client.SessionControl;
 import com.pachatbot.myproject.shared.Bean.Account;

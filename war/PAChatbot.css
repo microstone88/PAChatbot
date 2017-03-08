@@ -27,34 +27,40 @@ input.mobileSendButton, button.mobileSendButton {
 .normalSentMessageText {
 	color: #3995d6;
 	font-size: 1.2em;
+	text-align: left;
 }
 
 .normalReceivedMessageText {
 	color: #5aa445;
 	font-size: 1.2em;
+	text-align: left;
 }
 
 .mobileSentMessageText {
 	color: #3995d6;
 	font-size: 1.4em;
 	font-weight: normal;
+	text-align: left;
 }
 
 .mobileReceivedMessageText {
 	color: #5aa445;
 	font-size: 1.4em;
 	font-weight: normal;
+	text-align: left;
 }
 
 .sentBubble {
   /* color: #3995d6; */
   padding: 1px;
+  max-width: 80%;
   /* background-color: #3995d6; */
 }
 
 .receivedBubble {
   /* color: #5aa445; */
   padding: 1px;
+  max-width: 80%;
   /* background-color: #5aa445; */
 }
 
