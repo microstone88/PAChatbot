@@ -3,12 +3,13 @@
  */
 package com.pachatbot.myproject.server;
 
+import java.util.Locale;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.pachatbot.myproject.client.MessageService;
 import com.pachatbot.myproject.server.Database.DB;
 import com.pachatbot.myproject.server.Database.TABLES;
 import com.pachatbot.myproject.shared.Bean.Message;
-import com.pachatbot.myproject.shared.Bean.QueryResult;
 
 /**
  * @author micro
@@ -33,7 +34,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 	 * @see com.pachatbot.myproject.client.MessageService#getMessage(java.lang.String)
 	 */
 	@Override
-	public Message getMessage(String input) {
+	public Message getGreetingMessage(String input) {
 		String messageString = "Hello " + input + "!";
 		Message message = new Message();
 		message.setMessage(messageString);
@@ -62,8 +63,21 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 	 */
 	@Override
 	public Message getResponse(String question) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		String std_question = PiBrain.parseToStdQuestion(question);
+		Locale locale_lang = PiBrain.detectLanguage(std_question);
+		
+		QueryResult qr = SqlQueryUtils.queryForStdAnswer(locale_lang, std_question);
+		
+		//TODO internalization of the following error message
+		if (qr.isEmpty()) return new Message("Sorry, I don't get it.");
+		if (qr.isNull()) return new Message("Oops! I'm stuck now. Please try later.");
+		
+		if (qr.isUniqueValue()) {
+			String response = (String) qr.getUniqueResult();
+			return new Message(response);
+		} else 
+			return new Message(qr.toString());
 	}
 
 

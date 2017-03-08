@@ -1,8 +1,10 @@
 package com.pachatbot.myproject.server;
 
+import java.util.Locale;
+
 import com.pachatbot.myproject.server.Database.DB;
 import com.pachatbot.myproject.server.Database.TABLES;
-import com.pachatbot.myproject.shared.Bean.QueryResult;
+import com.pachatbot.myproject.shared.FieldVerifier;
 
 public class Test {
 
@@ -21,19 +23,24 @@ public class Test {
 		
 //		MySqlUtils.testQuery();
 		
-		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
-		System.out.println(qr);
+//		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
+//		System.out.println(qr);
+		
+		System.out.println(Locale.FRANCE);
+		System.out.println(Locale.US);
+		System.out.println(Locale.UK);
+		System.out.println(Locale.CHINA);
 		
 //		QueryResult qr = SqlQueryUtils.queryForStdAnswer(Locale.FRENCH, "something");
 //		QueryResult qr = SqlQueryUtils.queryForClientInfoByPrimaryID(10);
 		
 //		QueryResult qr = new QueryResult();
 		
-		QueryResult qr2 = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
-		System.out.println(qr2);
-		
-		QueryResult qr3 = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
-		System.out.println(qr3);
+//		QueryResult qr2 = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
+//		System.out.println(qr2);
+//		
+//		QueryResult qr3 = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
+//		System.out.println(qr3);
 		
 //		System.out.println("isUniqueValue = " + qr.isUniqueValue());
 //		System.out.println("isUniqueRow = " + qr.isUniqueRow());

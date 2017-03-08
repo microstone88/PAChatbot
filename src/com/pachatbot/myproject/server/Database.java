@@ -9,8 +9,6 @@ import java.sql.Statement;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 
-import com.pachatbot.myproject.shared.Bean.QueryResult;
-
 /**
  * @author micro
  *

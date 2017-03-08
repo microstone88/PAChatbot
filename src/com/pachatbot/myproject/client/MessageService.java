@@ -20,7 +20,7 @@ public interface MessageService extends RemoteService {
 	 * @param input
 	 * @return "Hello!"
 	 */
-	Message getMessage(String input);
+	Message getGreetingMessage(String input);
 	
 	/**
 	 * try to connect to the database.

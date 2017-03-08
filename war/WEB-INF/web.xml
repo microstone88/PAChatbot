@@ -8,7 +8,7 @@
   <!-- Servlets -->
   <servlet>
     <servlet-name>greetServlet</servlet-name>
-    <servlet-class>com.pachatbot.myproject.server.GreetingServiceImpl</servlet-class>
+    <servlet-class>com.pachatbot.myproject.server.deprecated.GreetingServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>

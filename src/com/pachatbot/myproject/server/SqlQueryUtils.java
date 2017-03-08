@@ -5,8 +5,6 @@ package com.pachatbot.myproject.server;
 
 import java.util.Locale;
 
-import com.pachatbot.myproject.shared.Bean.QueryResult;
-
 /**
  * @author micro
  *
@@ -32,6 +30,7 @@ abstract class SqlQueryUtils extends Database {
 	static QueryResult queryForStdAnswer(Locale locale_lang, String std_question) {
 		sql = "SELECT `std_answer` FROM " + TABLES.basic_std_answers 
 				+ " WHERE `std_question` = \"" + std_question.toLowerCase(locale_lang) + "\"";
+//						+ " AND `locale` = \"" + locale_lang + "\"";
 		return Database.runQuery(sql);
 	}
 	

@@ -12,7 +12,7 @@ import com.pachatbot.myproject.shared.Bean.Message;
  */
 public interface MessageServiceAsync {
 	
-	void getMessage(String input, AsyncCallback<Message> callback);
+	void getGreetingMessage(String input, AsyncCallback<Message> callback);
 	
 	void connectToDB(AsyncCallback<String> callback);
 	

@@ -1,15 +1,25 @@
 package com.pachatbot.myproject.client;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.text.translate.AggregateTranslator;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -20,6 +30,10 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
+import com.pachatbot.myproject.shared.FieldVerifier;
+import com.pachatbot.myproject.shared.Bean.Message;
+
+
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -52,6 +66,10 @@ public class PAChatbot implements EntryPoint {
 				|| Window.Navigator.getUserAgent().toLowerCase().contains("mobile");
 	}
 	
+	private static final String[] DEFAULT_TEXT = {"username or email or cellphone",
+			"password", "first name", "second name", "email address", "cellphone number",
+			"username", "password"};
+	
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -63,7 +81,6 @@ public class PAChatbot implements EntryPoint {
 	/**
 	 * Create a remote service proxy to talk to the server-side service.
 	 */
-	private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
 	private final MessageServiceAsync messageService = GWT.create(MessageService.class);
 	private final SessionControlAsync sessionService = GWT.create(SessionControl.class);
 
@@ -73,8 +90,6 @@ public class PAChatbot implements EntryPoint {
 	 */
 	@Override
 	public void onModuleLoad() {
-		
-		final String userAgent = Window.Navigator.getUserAgent();
 		
 		final FadeAnimation fadeAnimation = new FadeAnimation();
 		
@@ -86,7 +101,6 @@ public class PAChatbot implements EntryPoint {
 		 *  Dialogue UI
 		 */
 		final TextBox messageField = new TextBox();
-		messageField.setText("Hello, Pi!");
 		messageField.setSize("97%", "1.2em");
 		final Button sendButton = new Button("Send");
 		
@@ -113,48 +127,62 @@ public class PAChatbot implements EntryPoint {
 		 *  Sign in UI
 		 */
 		final TextBox usrField = new TextBox();
-		usrField.setText("username or email or cellphone");
+		usrField.setTitle(DEFAULT_TEXT[0]);
+		usrField.setText(DEFAULT_TEXT[0]);
 		final PasswordTextBox pwField = new PasswordTextBox();
-		pwField.setText("password");
+		pwField.setTitle(DEFAULT_TEXT[1]);
+		pwField.setText(DEFAULT_TEXT[1]);
+		pwField.getElement().setAttribute("type", "text");
+		final CheckBox showPwCheck = new CheckBox(" Show password");
+		showPwCheck.setValue(true);
 		
 		final Button forgotPwButton = new Button("Forgotten?");
 		final Button signInButton = new Button("Sign In");
 		
 		final FlexTable signInTable = new FlexTable();
-		signInTable.setCellSpacing(4);
+		signInTable.setCellSpacing(6);
 		
 		final FlexCellFormatter signInTableFormatter = 
 				signInTable.getFlexCellFormatter();
 		signInTable.setWidget(0, 0, usrField);
 		signInTable.setWidget(1, 0, pwField);
+		signInTable.setWidget(2, 0, showPwCheck);
 		signInTableFormatter.setColSpan(0, 0, 2);
 		signInTableFormatter.setColSpan(1, 0, 2);
-		signInTable.setWidget(2, 0, forgotPwButton);
-		signInTable.setWidget(2, 1, signInButton);
+		signInTableFormatter.setColSpan(2, 0, 2);
+		signInTable.setWidget(3, 0, forgotPwButton);
+		signInTable.setWidget(3, 1, signInButton);
 		signInTableFormatter.setHorizontalAlignment(0, 0, 
 				HasHorizontalAlignment.ALIGN_CENTER);
 		signInTableFormatter.setHorizontalAlignment(1, 0, 
 				HasHorizontalAlignment.ALIGN_CENTER);
-		signInTableFormatter.setHorizontalAlignment(2, 1, 
+		signInTableFormatter.setHorizontalAlignment(3, 1, 
 				HasHorizontalAlignment.ALIGN_RIGHT);
 		
 		/**
 		 *  Register UI
 		 */
 		final TextBox fstNameField = new TextBox();
-		fstNameField.setText("first name");
+		fstNameField.setTitle(DEFAULT_TEXT[2]);
+		fstNameField.setText(DEFAULT_TEXT[2]);
 		final TextBox sndNameField = new TextBox();
-		sndNameField.setText("second name");
+		sndNameField.setTitle(DEFAULT_TEXT[3]);
+		sndNameField.setText(DEFAULT_TEXT[3]);
 		
 		final TextBox emailField = new TextBox();
-		emailField.setText("email address");
+		emailField.setTitle(DEFAULT_TEXT[4]);
+		emailField.setText(DEFAULT_TEXT[4]);
 		final TextBox cellphoneField = new TextBox();
-		cellphoneField.setText("cellphone number");
+		cellphoneField.setTitle(DEFAULT_TEXT[5]);
+		cellphoneField.setText(DEFAULT_TEXT[5]);
 		
 		final TextBox newUsrField = new TextBox();
-		newUsrField.setText("username");
+		newUsrField.setTitle(DEFAULT_TEXT[6]);
+		newUsrField.setText(DEFAULT_TEXT[6]);
 		final PasswordTextBox newPwField = new PasswordTextBox();
-		newPwField.setText("password");
+		newPwField.setTitle(DEFAULT_TEXT[7]);
+		newPwField.setText(DEFAULT_TEXT[7]);
+		newPwField.getElement().setAttribute("type", "text");
 		
 		final CheckBox agreeCheck = new CheckBox();
 		agreeCheck.setHTML(" I agree to "
@@ -162,10 +190,12 @@ public class PAChatbot implements EntryPoint {
 				+ "the terms & services"
 				+ "</a>.");
 		final CheckBox showNewPwCheck = new CheckBox(" Show password");
+		showNewPwCheck.setValue(true);
 		final Button signUpButton = new Button("Sign Up");
+		signUpButton.setEnabled(false);
 		
 		final FlexTable registerTable = new FlexTable();
-		registerTable.setCellSpacing(4);
+		registerTable.setCellSpacing(6);
 
 		final FlexCellFormatter registerTableCellFormatter =
 				registerTable.getFlexCellFormatter();
@@ -324,6 +354,7 @@ public class PAChatbot implements EntryPoint {
 			signInButton.addStyleName("mobileSendButton");
 			signUpButton.addStyleName("mobileSendButton");
 			
+			showPwCheck.addStyleName("mobileDisplayText");
 			agreeCheck.addStyleName("mobileDisplayText");
 			showNewPwCheck.addStyleName("mobileDisplayText");
 			
@@ -370,9 +401,16 @@ public class PAChatbot implements EntryPoint {
 		}
 		
 		
-		// Focus the cursor on the name field when the app loads
-		messageField.setFocus(true);
-		messageField.selectAll();
+		if (!IS_MOBILE) {
+			
+			messageField.setText("Hello, Pi!");
+			// Focus the cursor on the name field when the app loads
+			messageField.setFocus(true);
+			messageField.selectAll();
+			
+		} else {
+			messageField.setText("");
+		}
 		
 		Window.addResizeHandler(new ResizeHandler() {
 			
@@ -400,7 +438,10 @@ public class PAChatbot implements EntryPoint {
 			 */
 			@Override
 			public void onClick(ClickEvent event) {
-				sendMsgToServer();
+				String txtToBeSent = messageField.getText();
+				if (!FieldVerifier.isEmpty(txtToBeSent)) {
+					sendMsgToServer(txtToBeSent);
+				}
 			}
 
 			/**
@@ -409,39 +450,43 @@ public class PAChatbot implements EntryPoint {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					sendMsgToServer();
+					String txtToBeSent = messageField.getText();
+					if (!FieldVerifier.isEmpty(txtToBeSent)) {
+						sendMsgToServer(txtToBeSent);
+					}
 				}
 			}
 
-			private void sendMsgToServer() {
-				errorLabel.setText("");
-				final String txtToBeSent = messageField.getText();
-				displaySentMsgBubble(txtToBeSent);
+			private void sendMsgToServer(String message) {
+				displaySentMsgBubble(message);
 				
 				// send the message to the server
 				sendButton.setEnabled(false);
-				messageService.connectToDB(new AsyncCallback<String>() {
+				messageService.getResponse(message, new AsyncCallback<Message>() {
+					
+					@Override
+					public void onSuccess(Message result) {
+						displayReceivedMsgBubble(result.getMessage());
+						onceFinishSending();
+					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
 						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
 						onceFinishSending();
 					}
-
-					@Override
-					public void onSuccess(String result) {
-						displayReceivedMsgBubble("Hello, there!");
-//						Window.alert(result);
-						errorLabel.setText(userAgent);
-						onceFinishSending();
-					}
 				});
+				
 			}
 			
 			private void onceFinishSending() {
 				sendButton.setEnabled(true);
-				messageField.setFocus(true);
-				messageField.selectAll();
+				if (!IS_MOBILE) {
+					messageField.setFocus(true);
+					messageField.selectAll();
+				} else {
+					messageField.setText("");
+				}
 			}
 			
 			private void displaySentMsgBubble(String msg) {
@@ -496,5 +541,77 @@ public class PAChatbot implements EntryPoint {
 		sendButton.addClickHandler(handler);
 		messageField.addKeyUpHandler(handler);
 		
+		showPwCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				String currentType = pwField.getElement().getAttribute("type");
+				if (currentType.contains("password"))
+					pwField.getElement().setAttribute("type", "text");
+				if (currentType.contains("text"))
+					pwField.getElement().setAttribute("type", "password");
+			}
+		});
+		
+		showNewPwCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				String currentType = newPwField.getElement().getAttribute("type");
+				if (currentType.contains("password"))
+					newPwField.getElement().setAttribute("type", "text");
+				if (currentType.contains("text"))
+					newPwField.getElement().setAttribute("type", "password");
+			}
+		});
+		
+		agreeCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				if (agreeCheck.getValue()) signUpButton.setEnabled(true);
+				else signUpButton.setEnabled(false);
+				
+			}
+		});
+		
+		TextBox[] fields = {usrField, pwField, fstNameField, sndNameField,
+				emailField, cellphoneField, newUsrField, newPwField};
+		addFocusHandlers(fields);
+		
 	}
+	
+	private void addFocusHandlers(final TextBox... fields) {
+		for (final TextBox textbox : fields) {
+			textbox.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					textbox.setText("");
+				}
+			});
+			textbox.addFocusHandler(new FocusHandler() {
+				
+				@Override
+				public void onFocus(FocusEvent event) {
+					textbox.selectAll();
+				}
+			});
+			textbox.addBlurHandler(new BlurHandler() {
+				
+				@Override
+				public void onBlur(BlurEvent event) {
+					String currentText = textbox.getText();
+					// if empty, set the content as default
+					if (currentText.trim().length() < 1)
+						textbox.setText(
+							DEFAULT_TEXT[Arrays.asList(fields).indexOf(textbox)]);
+					// if not empty, validate the content
+//					else TODO validate the content
+						
+				}
+			});
+		}
+	}
+	
 }

@@ -1,2 +1,0 @@
-serviceClass: com.pachatbot.myproject.client.GreetingService
-path: 2E4446B5763C9061FC614DEB1138DA20.gwt.rpc
