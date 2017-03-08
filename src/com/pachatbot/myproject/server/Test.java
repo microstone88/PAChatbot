@@ -2,10 +2,6 @@ package com.pachatbot.myproject.server;
 
 import java.util.Locale;
 
-import com.pachatbot.myproject.server.Database.DB;
-import com.pachatbot.myproject.server.Database.TABLES;
-import com.pachatbot.myproject.shared.FieldVerifier;
-
 public class Test {
 
 	public static void main(String[] args) {

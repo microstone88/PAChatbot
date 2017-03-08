@@ -33,6 +33,7 @@ abstract class Database {
 		DB(String database){
 			this.database = database;
 		}
+		@Override
 		public String toString(){
 			return database;
 		}
@@ -53,6 +54,7 @@ abstract class Database {
 		TABLES(String table){
 			this.table = table;
 		}
+		@Override
 		public String toString(){
 			return table;
 		}

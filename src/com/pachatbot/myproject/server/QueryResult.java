@@ -122,6 +122,7 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 	 * (after the SQL statement has been successfully executed).
 	 * 
 	 */
+	@Override
 	public boolean isEmpty() {
 		if (
 			this.size() < 1
