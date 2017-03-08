@@ -72,7 +72,7 @@ public class PAChatbot implements EntryPoint {
 			"username", "password"};
 	
 	private static final int FADING_DURATION = 500;
-	private static final int SCROLLING_DURATION = 100;
+	private static final int SCROLLING_DURATION = 200;
 	private static final int MAX_SCROLLING_DURATION = 800;
 	
 	/**
@@ -363,9 +363,9 @@ public class PAChatbot implements EntryPoint {
 			signInButton.addStyleName("mobileSendButton");
 			signUpButton.addStyleName("mobileSendButton");
 			
-			showPwCheck.addStyleName("mobileDisplayText");
-			agreeCheck.addStyleName("mobileDisplayText");
-			showNewPwCheck.addStyleName("mobileDisplayText");
+			showPwCheck.setStyleName("mobileDisplayText");
+			agreeCheck.setStyleName("mobileDisplayText");
+			showNewPwCheck.setStyleName("mobileDisplayText");
 			
 			stackLayout.getHeaderWidget(0).setStyleName("customStackPanelHeader");
 			stackLayout.getHeaderWidget(1).setStyleName("customStackPanelHeader");
@@ -553,7 +553,9 @@ public class PAChatbot implements EntryPoint {
 			@Override
 			public void onFocus(FocusEvent event) {
 				if (IS_MOBILE) stackLayout.showWidget(chatScrollPanel);
-				scrollAnimator.scrollToEnd(MAX_SCROLLING_DURATION);
+				// ensure that the scroll animation triggered by sending has finished.
+				if (!scrollAnimator.isRunning())
+					scrollAnimator.scrollToEnd(MAX_SCROLLING_DURATION);
 			}
 		});
 		
