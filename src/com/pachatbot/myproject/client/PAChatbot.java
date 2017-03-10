@@ -1,9 +1,7 @@
 package com.pachatbot.myproject.client;
 
 import java.util.Arrays;
-
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -43,6 +41,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.pachatbot.myproject.client.animation.FadeAnimation;
 import com.pachatbot.myproject.client.animation.ScrollAnimation;
 import com.pachatbot.myproject.shared.FieldVerifier;
+import com.pachatbot.myproject.shared.StringUtils;
+import com.pachatbot.myproject.shared.Bean.Account;
 import com.pachatbot.myproject.shared.Bean.Message;
 
 /**
@@ -85,23 +85,49 @@ public class PAChatbot implements EntryPoint {
 
 	/**
 	 * Create a remote service proxy to talk to the server-side service.
+	 * Note: (by micro) this has been simplified by using the inner Utils class.
 	 */
-	private final MessageServiceAsync messageService = GWT.create(MessageService.class);
-	private final SessionControlAsync sessionService = GWT.create(SessionControl.class);
-	
+//	private final MessageServiceAsync messageService = GWT.create(MessageService.class);
+//	private final SessionControlAsync sessionService = GWT.create(SessionControl.class);
 
+	/**
+	 * Customized animation
+	 */
+	final FadeAnimation fadeAnimator = new FadeAnimation();
+	final ScrollAnimation scrollAnimator = new ScrollAnimation();
+	
+	/**
+	 * Dialogue container
+	 */
+	final VerticalPanel bubbleLayout = new VerticalPanel();
+	final ScrollPanel chatScrollPanel = new ScrollPanel();
+	
+	/**
+	 * Panels for layout on PC
+	 */
+	final HorizontalPanel accountPanel = new HorizontalPanel();
+	final DisclosurePanel signInPanel = new DisclosurePanel("Sign In");
+	final DisclosurePanel registerPanel = new DisclosurePanel("Register");
+	/**
+	 * Panels for layout on mobile device
+	 */
+	final StackLayoutPanel stackLayout = new StackLayoutPanel(Unit.EM);
+	final ScrollPanel signInScrollPanel = new ScrollPanel();
+	final ScrollPanel registerScrollPanel = new ScrollPanel();
+	
+	/**
+	 * For debugging
+	 */
+	final Label errorLabel = new Label();
+	
 	/**
 	 * This is the entry point method.
 	 */
 	@Override
 	public void onModuleLoad() {
 		
-		final FadeAnimation fadeAnimator = new FadeAnimation();
-		final ScrollAnimation scrollAnimator = new ScrollAnimation();
-		
-		final Label errorLabel = new Label();
 		errorLabel.setWidth("500px");
-		errorLabel.addStyleName("serverResponseLabelError");
+		errorLabel.addStyleName("errorLabel");
 		
 		/**
 		 *  Dialogue UI
@@ -121,11 +147,8 @@ public class PAChatbot implements EntryPoint {
 		sendPanel.setCellWidth(sendButton, "3%");
 		sendPanel.ensureDebugId("sendPanel");
 		
-		final VerticalPanel bubbleLayout = new VerticalPanel();
 		bubbleLayout.setSpacing(5);
 		bubbleLayout.ensureDebugId("messagePanel");
-		
-		final ScrollPanel chatScrollPanel = new ScrollPanel();
 		chatScrollPanel.add(bubbleLayout);
 		chatScrollPanel.ensureDebugId("chatPanel");
 		scrollAnimator.setScrollPanel(chatScrollPanel);
@@ -238,42 +261,30 @@ public class PAChatbot implements EntryPoint {
 		registerTableCellFormatter.setHorizontalAlignment(7, 1, 
 				HasHorizontalAlignment.ALIGN_RIGHT);
 		
-		/**
-		 *  Panels for layout on mobile devices (for resizing)
-		 */
-		final StackLayoutPanel stackLayout = new StackLayoutPanel(Unit.EM);
-		stackLayout.ensureDebugId("stackLayout");
-		final DockLayoutPanel dockLayout = new DockLayoutPanel(Unit.EM);
-		dockLayout.ensureDebugId("dockLayout");
-		final ScrollPanel signInScrollPanel = new ScrollPanel();
-		signInScrollPanel.ensureDebugId("signInScrollPanel");
-		final ScrollPanel registerScrollPanel = new ScrollPanel();
-		registerScrollPanel.ensureDebugId("registerScrollPanel");
 		
 		if (!IS_MOBILE) {
 			
-			final DisclosurePanel signInPanel = new DisclosurePanel("Sign In");
 			signInPanel.setAnimationEnabled(true);
 			signInPanel.setOpen(false);
 			signInPanel.setContent(signInTable);
 			signInPanel.ensureDebugId("signInPanel");
 			
-			final DisclosurePanel registerPanel = new DisclosurePanel("Register");
 			registerPanel.setAnimationEnabled(true);
 			registerPanel.setOpen(false);
 			registerPanel.setContent(registerTable);
 			registerPanel.ensureDebugId("registerPanel");
 			
-			final HorizontalPanel accountPanel = new HorizontalPanel();
 			accountPanel.setSpacing(0);
 			accountPanel.add(signInPanel);
 			accountPanel.add(registerPanel);
-			accountPanel.setCellHorizontalAlignment(signInPanel, HasHorizontalAlignment.ALIGN_LEFT);
-			accountPanel.setCellHorizontalAlignment(registerPanel, HasHorizontalAlignment.ALIGN_LEFT);
+			accountPanel.setCellHorizontalAlignment(signInPanel, 
+					HasHorizontalAlignment.ALIGN_LEFT);
+			accountPanel.setCellHorizontalAlignment(registerPanel, 
+					HasHorizontalAlignment.ALIGN_LEFT);
 			accountPanel.ensureDebugId("accountPanel");
 			
 			/**
-			 *  <--- Styling --->
+			 *  <--- Styling on PC --->
 			 */
 			messageField.addStyleName("normalSendButton");
 			sendButton.addStyleName("normalSendButton");
@@ -281,14 +292,16 @@ public class PAChatbot implements EntryPoint {
 //			signInButton.addStyleName("normalSendButton");
 //			signUpButton.addStyleName("normalSendButton");
 			
+			signInPanel.getHeader().addStyleName("disclosurePanelHeader");
+			registerPanel.getHeader().addStyleName("disclosurePanelHeader");
+			
 			agreeCheck.addStyleName("normalDisplayText");
 			showNewPwCheck.addStyleName("normalDisplayText");
 			
 			/**
-			 * 	<--- Sizing --->
+			 * 	<--- Sizing on PC --->
 			 */
 			sendPanel.setWidth("540px");
-			accountPanel.setWidth("540px");
 			bubbleLayout.setSize("540px", "100%");
 			chatScrollPanel.setSize("560px", "240px");
 			
@@ -309,9 +322,10 @@ public class PAChatbot implements EntryPoint {
 			accountPanel.setWidth("560px");
 			
 			/**
-			 *  Main panel layout
+			 *  Main panel layout on PC
 			 */
 			final DockPanel dock = new DockPanel();
+			dock.ensureDebugId("dockPanel");
 //			dock.addStyleName("dock"); // For debugging
 			dock.setSize("100%", "100%");
 			dock.setSpacing(10);
@@ -322,31 +336,34 @@ public class PAChatbot implements EntryPoint {
 			dock.add(accountPanel, DockPanel.NORTH);
 			dock.add(sendPanel, DockPanel.SOUTH);
 			dock.add(chatScrollPanel, DockPanel.CENTER);
-			dock.ensureDebugId("dockPanel");
 
 			// Add the main dock panel to the Root panel 
 			RootPanel.get().add(dock);
 			
+			/**
+			 * On-startup settings on PC
+			 */
+			messageField.setText("Hello, Pi!");
+			// Focus the cursor on the name field when the app loads
+			messageField.setFocus(true);
+			messageField.selectAll();
+			
 		} else {
 			
-//			final LayoutPanel signInLayout = new LayoutPanel();
-//			signInLayout.add(signInTable);
-//			signInLayout.setWidgetLeftRight(signInTable, 10, Unit.PCT, 10, Unit.PCT);
-			
-//			final LayoutPanel registerLayout = new LayoutPanel();
-//			registerLayout.add(registerTable);
-//			registerLayout.setWidgetLeftRight(registerTable, 10, Unit.PCT, 10, Unit.PCT);
+			signInScrollPanel.ensureDebugId("signInScrollPanel");
+			registerScrollPanel.ensureDebugId("registerScrollPanel");
 			
 			signInScrollPanel.add(signInTable);
 			registerScrollPanel.add(registerTable);
 			
+			stackLayout.ensureDebugId("stackLayout");
 			stackLayout.add(chatScrollPanel, new HTML("Dialogue"), 2.4);
 			stackLayout.add(signInScrollPanel, new HTML("Sign In"), 2.4);
 			stackLayout.add(registerScrollPanel, new HTML("Register"), 2.4);
 			stackLayout.showWidget(chatScrollPanel);
 			
 			/**
-			 *  <--- Styling --->
+			 *  <--- Styling on mobile device --->
 			 */
 			messageField.addStyleName("mobileSendButton");
 			usrField.addStyleName("mobileSendButton");
@@ -372,7 +389,7 @@ public class PAChatbot implements EntryPoint {
 			stackLayout.getHeaderWidget(2).setStyleName("customStackPanelHeader");
 			
 			/**
-			 *  <--- Sizing --->
+			 *  <--- Sizing on mobile device --->
 			 */
 			sendPanel.setWidth("100%");
 			sendPanel.setHeight("100%");
@@ -396,8 +413,10 @@ public class PAChatbot implements EntryPoint {
 			registerTable.setWidth(width - 8 + "px");
 			
 			/**
-			 *  Main panel layout
+			 *  Main panel layout on mobile device
 			 */
+			final DockLayoutPanel dockLayout = new DockLayoutPanel(Unit.EM);
+			dockLayout.ensureDebugId("dockLayout");
 //			dockLayout.addStyleName("dock"); // For debugging
 			dockLayout.addNorth(new HTML("<h1>Hi, &pi;-chatbot!</h1>"), 4);
 			dockLayout.addSouth(sendPanel, 4);
@@ -405,20 +424,15 @@ public class PAChatbot implements EntryPoint {
 			
 			// Add the main dock layout panel to the Root layout panel
 			RootLayoutPanel.get().add(dockLayout);
-		}
-		
-		if (!IS_MOBILE) {
 			
-			messageField.setText("Hello, Pi!");
-			// Focus the cursor on the name field when the app loads
-			messageField.setFocus(true);
-			messageField.selectAll();
-			
-		} else {
-			
+			/**
+			 * On-startup settings on mobile device
+			 */
 			messageField.setText("");
 			
-			// Handle window resizing event
+			/**
+			 * Handle window resizing event on mobile device
+			 */
 			Window.addResizeHandler(new ResizeHandler() {
 				
 				@Override
@@ -434,11 +448,16 @@ public class PAChatbot implements EntryPoint {
 			});
 			
 			// TODO Force resize layout height on ios device
-
+			
 		}
 		
-		// Create a handler for the sendButton and messageField
-		class MyHandler implements ClickHandler, KeyUpHandler {
+		/**
+		 * Handling sending action triggered by either clicking "Send" 
+		 * button or pressing "Enter" key after typing.
+		 * 
+		 * @author micro
+		 */
+		class SendActionHandler implements ClickHandler, KeyUpHandler {
 			/**
 			 * Fired when the user clicks on the sendButton.
 			 */
@@ -468,7 +487,8 @@ public class PAChatbot implements EntryPoint {
 				
 				// send the message to the server
 				sendButton.setEnabled(false);
-				messageService.getResponse(message, new AsyncCallback<Message>() {
+				MessageService.Utils.getInstance().getResponse(message, 
+						new AsyncCallback<Message>() {
 					
 					@Override
 					public void onSuccess(Message result) {
@@ -478,7 +498,8 @@ public class PAChatbot implements EntryPoint {
 					
 					@Override
 					public void onFailure(Throwable caught) {
-						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
+						displayReceivedMsgBubble(SERVER_ERROR);
+//						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
 						onceFinishSending();
 					}
 				});
@@ -495,59 +516,86 @@ public class PAChatbot implements EntryPoint {
 				}
 			}
 			
-			private void displaySentMsgBubble(String msg) {
-				final Label sentMsgLable = new Label(msg);
-				if (!IS_MOBILE) sentMsgLable.setStyleName("normalSentMessageText");
-				else {
-					// Ensure the visibility on mobile device
-					stackLayout.showWidget(chatScrollPanel); 
-					sentMsgLable.setStyleName("mobileSentMessageText");
+		}
+		
+		// Add send action handler to "Send" button and response to "Enter" key press
+		final SendActionHandler sendhandler = new SendActionHandler();
+		sendButton.addClickHandler(sendhandler);
+		messageField.addKeyUpHandler(sendhandler);
+		
+		class SignInActionHandler implements ClickHandler, KeyUpHandler {
+
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					String identifier = usrField.getText();
+					String password = pwField.getText();
+					signIn(identifier, password);
 				}
-				DecoratorPanel sentBubble = new DecoratorPanel();
-				sentBubble.addStyleName("sentBubble");
-			    sentBubble.setWidget(sentMsgLable);
-				bubbleLayout.add(sentBubble);
-				bubbleLayout.setCellHorizontalAlignment(sentBubble, HasHorizontalAlignment.ALIGN_RIGHT);
-				scrollAnimator.scrollToEnd(SCROLLING_DURATION);
-//				chatScrollPanel.ensureVisible(sentBubble);
-				
-				// add animation to the message bubble
-				fadeAnimator.cancel();
-				sentBubble.getElement().getStyle().setOpacity(.01);
-				fadeAnimator.setElement(sentBubble);
-				fadeAnimator.fade(FADING_DURATION, 1.0);
+			}
+
+			@Override
+			public void onClick(ClickEvent event) {
+				String identifier = usrField.getText();
+				String password = pwField.getText();
+				signIn(identifier, password);
 			}
 			
-			void displayReceivedMsgBubble(String msg) {
-				final Label receivedMsgLable = new Label(msg);
-				if (!IS_MOBILE) receivedMsgLable.setStyleName("normalReceivedMessageText");
-				else {
-					// Ensure the visibility on mobile device
-					stackLayout.showWidget(chatScrollPanel);
-					receivedMsgLable.setStyleName("mobileReceivedMessageText");
-				}
-				DecoratorPanel receivedBubble = new DecoratorPanel();
-				receivedBubble.addStyleName("receivedBubble");
-			    receivedBubble.setWidget(receivedMsgLable);
-				bubbleLayout.add(receivedBubble);
-				bubbleLayout.setCellHorizontalAlignment(receivedBubble, HasHorizontalAlignment.ALIGN_LEFT);
-				scrollAnimator.scrollToEnd(SCROLLING_DURATION);
-//				chatScrollPanel.ensureVisible(receivedBubble);
-				
-				// add animation to the message bubble
-				fadeAnimator.cancel();
-				receivedBubble.getElement().getStyle().setOpacity(.1);
-				fadeAnimator.setElement(receivedBubble);
-				fadeAnimator.fade(FADING_DURATION, 1.0);
+			private void signIn(String identifier, String password) {
+				SessionControl.Utils.getInstance().login(identifier, password, 
+						new AsyncCallback<Account>() {
+					
+					@Override
+					public void onSuccess(Account result) {
+						usrField.setText(DEFAULT_TEXT[0]);
+						pwField.setText(DEFAULT_TEXT[1]);
+						if (result.getUid() == 0) {
+							displayReceivedMsgBubble("Ummm... maybe try again? Or register now!");
+							return;
+						}
+						String fstName = StringUtils.CapitalizeFstLetter(result.getFirstname());
+						displayReceivedMsgBubble("Welcome back, " + fstName + "!");
+						
+						if (!IS_MOBILE) {
+							accountPanel.clear();
+							addSignOutPanel();
+							
+						} else {
+							//remove the second widget ("Sign In" panel)
+							stackLayout.remove(1); 
+							//remove the second widget ("Register" panel)
+							stackLayout.remove(1); 
+							addSignOutPanel();
+						}
+						
+						// For debugging
+//						displayReceivedMsgBubble(result.toString());
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
+					}
+				});
 			}
 			
 		}
 		
-		// Add a handler to send the name to the server
-		final MyHandler handler = new MyHandler();
-		sendButton.addClickHandler(handler);
-		messageField.addKeyUpHandler(handler);
+		final SignInActionHandler signInHandler = new SignInActionHandler();
+		signInButton.addClickHandler(signInHandler);
+		pwField.addKeyUpHandler(signInHandler);
 		
+		forgotPwButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				displayReceivedMsgBubble("Sorry! This service is currently not available.");				
+			}
+		});
+		
+		/**
+		 * Handling other UI events
+		 */
 		messageField.addFocusHandler(new FocusHandler() {
 			
 			@Override
@@ -597,22 +645,76 @@ public class PAChatbot implements EntryPoint {
 				emailField, cellphoneField, newUsrField, newPwField};
 		addFocusHandlers(fields);
 		
+		usrField.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					pwField.setFocus(true);
+				}
+			}
+		});
+
+		fstNameField.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					sndNameField.setFocus(true);
+				}
+			}
+		});
+		
+		sndNameField.addKeyUpHandler(new KeyUpHandler() {
+			
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					emailField.setFocus(true);
+				}
+			}
+		});
+		
+		emailField.addKeyUpHandler(new KeyUpHandler() {
+			
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					cellphoneField.setFocus(true);
+				}
+			}
+		});
+		
+		cellphoneField.addKeyUpHandler(new KeyUpHandler() {
+			
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					newUsrField.setFocus(true);
+				}
+			}
+		});
+		
+		newUsrField.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					newPwField.setFocus(true);
+				}
+			}
+		});
+		
+		
 	}
 	
 	private void addFocusHandlers(final TextBox... fields) {
 		for (final TextBox textbox : fields) {
-			textbox.addClickHandler(new ClickHandler() {
-				
-				@Override
-				public void onClick(ClickEvent event) {
-					textbox.setText("");
-				}
-			});
+			textbox.addStyleName("defaultTextFieldText");
 			textbox.addFocusHandler(new FocusHandler() {
 				
 				@Override
 				public void onFocus(FocusEvent event) {
 					textbox.selectAll();
+					textbox.setText("");
+					textbox.removeStyleName("defaultTextFieldText");
 				}
 			});
 			textbox.addBlurHandler(new BlurHandler() {
@@ -621,14 +723,147 @@ public class PAChatbot implements EntryPoint {
 				public void onBlur(BlurEvent event) {
 					String currentText = textbox.getText();
 					// if empty, set the content as default
-					if (currentText.trim().length() < 1)
+					if (currentText.trim().length() < 1) {
 						textbox.setText(
-							DEFAULT_TEXT[Arrays.asList(fields).indexOf(textbox)]);
+								DEFAULT_TEXT[Arrays.asList(fields).indexOf(textbox)]);
+						textbox.addStyleName("defaultTextFieldText");
+					}
 					// if not empty, validate the content
 //					else TODO validate the content
-						
+					
+					
 				}
 			});
+		}
+	}
+	
+	private void displaySentMsgBubble(String msg) {
+		final Label sentMsgLable = new Label(msg);
+		if (!IS_MOBILE) sentMsgLable.setStyleName("normalSentMessageText");
+		else {
+			// Ensure the visibility on mobile device
+			stackLayout.showWidget(chatScrollPanel); 
+			sentMsgLable.setStyleName("mobileSentMessageText");
+		}
+		DecoratorPanel sentBubble = new DecoratorPanel();
+		sentBubble.addStyleName("sentBubble");
+	    sentBubble.setWidget(sentMsgLable);
+		bubbleLayout.add(sentBubble);
+		bubbleLayout.setCellHorizontalAlignment(sentBubble, HasHorizontalAlignment.ALIGN_RIGHT);
+		scrollAnimator.scrollToEnd(SCROLLING_DURATION);
+//		chatScrollPanel.ensureVisible(sentBubble);
+		
+		// add animation to the message bubble
+		fadeAnimator.cancel();
+		sentBubble.getElement().getStyle().setOpacity(.01);
+		fadeAnimator.setElement(sentBubble);
+		fadeAnimator.fade(FADING_DURATION, 1.0);
+	}
+	
+	private void displayReceivedMsgBubble(String msg) {
+		final Label receivedMsgLable = new Label(msg);
+		if (!IS_MOBILE) receivedMsgLable.setStyleName("normalReceivedMessageText");
+		else {
+			// Ensure the visibility on mobile device
+			stackLayout.showWidget(chatScrollPanel);
+			receivedMsgLable.setStyleName("mobileReceivedMessageText");
+		}
+		DecoratorPanel receivedBubble = new DecoratorPanel();
+		receivedBubble.addStyleName("receivedBubble");
+	    receivedBubble.setWidget(receivedMsgLable);
+		bubbleLayout.add(receivedBubble);
+		bubbleLayout.setCellHorizontalAlignment(receivedBubble, HasHorizontalAlignment.ALIGN_LEFT);
+		scrollAnimator.scrollToEnd(SCROLLING_DURATION);
+//		chatScrollPanel.ensureVisible(receivedBubble);
+		
+		// add animation to the message bubble
+		fadeAnimator.cancel();
+		receivedBubble.getElement().getStyle().setOpacity(.1);
+		fadeAnimator.setElement(receivedBubble);
+		fadeAnimator.fade(FADING_DURATION, 1.0);
+	}
+	
+	
+	private void addSignOutPanel() {
+		
+		final Button exportButton = new Button("Export History");
+		exportButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				displayReceivedMsgBubble("Sorry! This service is currently not available.");
+			}
+		});
+		
+		
+		final Button signOutButton = new Button("Sign out");
+		signOutButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				SessionControl.Utils.getInstance().logout(new AsyncCallback<Void>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
+					}
+
+					@Override
+					public void onSuccess(Void result) {
+						displayReceivedMsgBubble("See you later, then!");
+						
+						if (!IS_MOBILE) {
+							accountPanel.clear();
+							
+							accountPanel.add(signInPanel);
+							accountPanel.add(registerPanel);
+							
+							signInPanel.setOpen(false);
+							registerPanel.setOpen(false);
+							
+						} else {
+							stackLayout.remove(1);
+							
+							stackLayout.add(signInScrollPanel, new HTML("Sign In"), 2.4);
+							stackLayout.add(registerScrollPanel, new HTML("Register"), 2.4);
+							
+							stackLayout.getHeaderWidget(1).setStyleName("customStackPanelHeader");
+							stackLayout.getHeaderWidget(2).setStyleName("customStackPanelHeader");
+						}
+					}
+				});
+			}
+		});
+		
+		final FlexTable signOutTable = new FlexTable();
+		signOutTable.setCellSpacing(6);
+		
+		final FlexCellFormatter signOutTableFormatter = 
+				signOutTable.getFlexCellFormatter();
+		signOutTable.setWidget(0, 0, exportButton);
+		signOutTable.setWidget(0, 1, signOutButton);
+		signOutTableFormatter.setHorizontalAlignment(0, 1, 
+				HasHorizontalAlignment.ALIGN_RIGHT);
+		
+		if (!IS_MOBILE) {
+			
+			accountPanel.add(signOutTable);
+			accountPanel.setCellHorizontalAlignment(signOutTable, 
+					HasHorizontalAlignment.ALIGN_RIGHT);
+			
+		} else {
+			
+			final ScrollPanel signOutScrollPanel = new ScrollPanel();
+			signOutScrollPanel.add(signOutTable);
+			signOutScrollPanel.ensureDebugId("signOutScrollPanel");
+			
+			stackLayout.add(signOutScrollPanel, new HTML("Sign Out"), 2.4);
+			
+			exportButton.addStyleName("mobileSendButton");
+			signOutButton.addStyleName("mobileSendButton");
+			
+			stackLayout.getHeaderWidget(1).setStyleName("customStackPanelHeader");
+			
 		}
 	}
 	

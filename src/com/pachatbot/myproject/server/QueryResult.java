@@ -96,14 +96,43 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 	}
 	
 	/**
-	 * get the object that is in the first row and the first 
-	 * column of the query result. This should usually be called 
+	 * get the object at the first row and the first column 
+	 * of the query result. This should usually be called 
 	 * after checking if the query result is a unique value.
 	 * 
 	 * @return the object
 	 */
-	public Object getUniqueResult() {
-		return this.iterator().next().get(this.getColumnName(1));
+	public Object getUniqueValue() {
+		return this.getValue(1, 1);
+	}
+	
+	/**
+	 * get the object at the given row and column.
+	 * @param row starts from "1"
+	 * @param column starts from "1"
+	 * @return the object
+	 */
+	public Object getValue(int row, int column) {
+		if (column > getColumnCount())
+			throw new IndexOutOfBoundsException("Column: " + column + ", Size: " + getColumnCount());
+		return this.getValue(row, getColumnName(column));
+	}
+	
+	/**
+	 * get the object at the given row and the specified column.
+	 * @param row starts from "1"
+	 * @param colname an existing column name
+	 * @return the object
+	 */
+	public Object getValue(int row, String colname) {
+		if (row > getRowCount()) 
+			throw new IndexOutOfBoundsException("Row: " + row + ", Size: " + getRowCount());
+		if (!columnNames.contains(colname))
+			throw new IllegalArgumentException("Column \"" + colname + "\" doesn't exist!");
+		int r = 0; LinkedHashMap<String, Object> targetRow = new LinkedHashMap<>(getColumnCount());
+		Iterator<LinkedHashMap<String, Object>> it = this.iterator();
+		while (r++ < row) targetRow = it.next();
+		return targetRow.get(colname);
 	}
 	
 	
@@ -125,7 +154,7 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 	@Override
 	public boolean isEmpty() {
 		if (
-			this.size() < 1
+			this.getRowCount() < 1
 			&& this.getColumnCount() > 0 // it contains column names
 		) return true;
 		else return false;
@@ -134,13 +163,13 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 	public boolean isUniqueValue() {
 		if (
 			this.getColumnCount() == 1	// only one column
-			&& this.size() == 1			// only one row
+			&& this.getRowCount() == 1			// only one row
 		) return true;
 		else return false;
 	}
 	
 	public boolean isUniqueRow() {
-		if (this.size() == 1) return true;
+		if (this.getRowCount() == 1) return true;
 		else return false;
 	}
 	
@@ -173,10 +202,16 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 		return str;
 	}
 	
+	/**
+	 * Returns the number of rows in this QueryResult object.
+	 * @return the number of columns
+	 */
+	public int getRowCount() {
+		return this.size();
+	}
 	
 	/**
 	 * Returns the number of columns in this QueryResult object.
-	 * 
 	 * @return the number of columns
 	 */
 	public int getColumnCount() {
@@ -186,7 +221,6 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 	
 	/**
 	 * Get the designated column's name.
-	 * 
 	 * @param column the first column is 1, the second is 2, ...
 	 * @return column name
 	 */

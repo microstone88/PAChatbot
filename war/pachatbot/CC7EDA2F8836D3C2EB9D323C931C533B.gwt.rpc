@@ -3,8 +3,12 @@ com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException, true, true, t
 com.google.gwt.user.client.rpc.RpcTokenException, true, true, false, false, com.google.gwt.user.client.rpc.RpcTokenException/2345075298, 2345075298
 com.google.gwt.user.client.rpc.XsrfToken, false, false, true, true, com.google.gwt.user.client.rpc.XsrfToken/4254043109, 4254043109
 com.pachatbot.myproject.client.SessionControl, false, false, false, false, _, 3814745805
-com.pachatbot.myproject.shared.Bean.Account, true, true, false, false, com.pachatbot.myproject.shared.Bean.Account/370124307, 370124307
+com.pachatbot.myproject.shared.Bean.Account, true, true, false, false, com.pachatbot.myproject.shared.Bean.Account/2542719773, 2542719773
+com.pachatbot.myproject.shared.PreDefinedEnum$LOCALE, true, true, false, false, com.pachatbot.myproject.shared.PreDefinedEnum$LOCALE/3791138394, 3791138394
+com.pachatbot.myproject.shared.PreDefinedEnum$STATUS, true, true, false, false, com.pachatbot.myproject.shared.PreDefinedEnum$STATUS/273393902, 273393902
 java.lang.Exception, true, false, true, false, java.lang.Exception/1920171873, 1920171873
 java.lang.RuntimeException, true, false, true, false, java.lang.RuntimeException/515124647, 515124647
 java.lang.String, true, true, true, true, java.lang.String/2004016611, 2004016611
 java.lang.Throwable, true, false, true, false, java.lang.Throwable/2953622131, 2953622131
+java.sql.Timestamp, true, true, false, false, java.sql.Timestamp/3040052672, 3040052672
+java.util.Date, true, false, false, false, java.util.Date/3385151746, 3385151746

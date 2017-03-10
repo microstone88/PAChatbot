@@ -28,20 +28,61 @@ abstract class SqlQueryUtils extends Database {
 	
 	
 	static QueryResult queryForStdAnswer(Locale locale_lang, String std_question) {
-		sql = "SELECT `std_answer` FROM " + TABLES.basic_std_answers 
-				+ " WHERE `std_question` = \"" + std_question.toLowerCase(locale_lang) + "\"";
+		sql = "SELECT `" + COLNAME.std_Answer + "` FROM `" + TABLES.std_answers + "`"
+				+ " WHERE `" + COLNAME.std_Question + "` = \"" + std_question.toLowerCase(locale_lang) + "\"";
 //						+ " AND `locale` = \"" + locale_lang + "\"";
 		return Database.runQuery(sql);
 	}
 	
 	
 	static QueryResult queryForClientInfoByPrimaryID(Integer uid) {
-		sql = "SELECT * FROM " + TABLES.clients_info 
-				+ " WHERE `uid` = " + uid + "";
+		sql = "SELECT " + COLNAME.locale + "," 
+						+ COLNAME.firstname + "," 
+						+ COLNAME.lastname + ","
+						+ COLNAME.email + "," 
+						+ COLNAME.cellphone 
+			+ " FROM `" + TABLES.info + "`"
+			+ " WHERE `" + COLNAME.uid + "` = " + uid + "";
 		return Database.runQuery(DB.clients, sql);
 	}
 	
+	static QueryResult queryForClientLoginByUsername(String username, String password) {
+		sql = "SELECT * FROM `" + TABLES.login + "`"
+				+ " WHERE `" + COLNAME.username + "` = \"" + username + "\""
+				+ " AND `" + COLNAME.password + "` = AES_ENCRYPT('" + password + "','" + Database.KEY_STR + "')";
+		return Database.runQuery(DB.clients, sql);
+	}
 	
+	static QueryResult queryForClientLoginByUID(int uid, String password) {
+		sql = "SELECT * FROM `" + TABLES.login + "`"
+				+ " WHERE `" + COLNAME.uid + "` = " + uid + ""
+				+ " AND `" + COLNAME.password + "` = AES_ENCRYPT('" + password + "','" + Database.KEY_STR + "')";
+		return Database.runQuery(DB.clients, sql);
+	}
+	
+	static QueryResult queryForClientInfoByEmail(String email) {
+		sql = "SELECT " + COLNAME.uid + ","
+						+ COLNAME.locale + "," 
+						+ COLNAME.firstname + "," 
+						+ COLNAME.lastname + ","
+						+ COLNAME.cellphone 
+			+ " FROM `" + TABLES.info + "`"
+			+ " WHERE `" + COLNAME.email + "` = \"" + email + "\"";
+		return Database.runQuery(DB.clients, sql);
+	}
+	
+	static QueryResult queryForClientInfoByCellphone(String cellphone) {
+		sql = "SELECT " + COLNAME.uid + ","
+						+ COLNAME.locale + "," 
+						+ COLNAME.firstname + "," 
+						+ COLNAME.lastname + ","
+						+ COLNAME.email 
+			+ " FROM `" + TABLES.info + "`"
+			+ " WHERE `" + COLNAME.cellphone + "` = \"" + cellphone + "\"";
+		return Database.runQuery(DB.clients, sql);
+	}
+	
+
 
 	
 }

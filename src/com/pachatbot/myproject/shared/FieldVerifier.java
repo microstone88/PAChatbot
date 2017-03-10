@@ -3,7 +3,7 @@ package com.pachatbot.myproject.shared;
 /**
  * 
  */
-public class FieldVerifier {
+public abstract class FieldVerifier {
 
 	/**
 	 * Verifies that the specified name is valid for our service.

@@ -10,15 +10,13 @@ import com.pachatbot.myproject.shared.Bean.Account;
  *
  */
 public interface SessionControlAsync {
-
-	void getAccountFromSession(AsyncCallback<Account> callback);
 	
-	void loginServer(String name, String password, AsyncCallback<Account> callback);
+	void login(String name, String password, AsyncCallback<Account> callback);
 	
-	void loginFromSessionServer(AsyncCallback<Account> callback);
+	void logout(AsyncCallback<Void> callback);
 	
 	void changePassword(String name, String newPassword, AsyncCallback<Boolean> callback);
 	
-	void logout(AsyncCallback<Void> callback);
+	void loginFromSessionServer(AsyncCallback<Account> callback);
 	
 }

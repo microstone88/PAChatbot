@@ -16,6 +16,15 @@ input.mobileSendButton, button.mobileSendButton {
   font-weight: normal;
 }
 
+.defaultTextFieldText {
+	color: #b3b3b3;
+}
+
+.disclosurePanelHeader {
+	/* color: #3995d6; */
+	/* font-weight: bold; */
+	/* background-color: #3995d6; */
+}
 
 .normalDisplayText {
 	font-size: 1.0em
@@ -143,6 +152,10 @@ html>body .gwt-DecoratorPanel {
   overflow: hidden;
 }
 
+.errorLabel {
+  color: red;
+}
+
 /** Example rules used by the template application (remove for your app) */
 h1 {
   font-size: 2em;
@@ -159,10 +172,6 @@ h1 {
 
 .dialogVPanel {
   margin: 5px;
-}
-
-.serverResponseLabelError {
-  color: red;
 }
 
 /** Set ids using widget.getElement().setId("idOfElement") */

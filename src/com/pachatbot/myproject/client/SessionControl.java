@@ -12,29 +12,28 @@ import com.pachatbot.myproject.shared.Bean.Account;
 @RemoteServiceRelativePath("SessionControl")
 public interface SessionControl extends RemoteService {
 	
-	public Account getAccountFromSession();
+	Account login(String name, String password);
 	
+	void logout();
+	
+	boolean changePassword(String name, String newPassword);
+	
+    Account loginFromSessionServer();
+    
 	/**
 	 * Utility class for simplifying access to the instance of async service.
 	 */
-	public static class Util {
+	static class Utils {
 		
 		private static SessionControlAsync instance;
-		
-		public static SessionControlAsync getInstance(){
+
+		static SessionControlAsync getInstance(){
 			if (instance == null) {
 				instance = GWT.create(SessionControl.class);
 			}
 			return instance;
 		}
+		
 	}
-	
-	Account loginServer(String name, String password);
-	 
-    Account loginFromSessionServer();
-     
-    boolean changePassword(String name, String newPassword);
  
-    void logout();
-	
 }

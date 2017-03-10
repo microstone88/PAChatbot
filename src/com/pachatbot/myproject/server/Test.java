@@ -1,6 +1,7 @@
 package com.pachatbot.myproject.server;
 
-import java.util.Locale;
+import com.pachatbot.myproject.server.Database.DB;
+import com.pachatbot.myproject.server.Database.TABLES;
 
 public class Test {
 
@@ -19,13 +20,19 @@ public class Test {
 		
 //		MySqlUtils.testQuery();
 		
-//		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
-//		System.out.println(qr);
+		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.clients, TABLES.login);
+		System.out.println(qr);
 		
-		System.out.println(Locale.FRANCE);
-		System.out.println(Locale.US);
-		System.out.println(Locale.UK);
-		System.out.println(Locale.CHINA);
+		QueryResult qrLogin = SqlQueryUtils.queryForClientLoginByUsername("admin", "Xiaohaier");
+		System.out.println(qrLogin.toString());
+
+//		QueryResult qrInfo = SqlQueryUtils.queryForClientInfoByPrimaryID(1);
+//		System.out.println(qrInfo);
+		
+//		System.out.println(Locale.FRANCE);
+//		System.out.println(Locale.US);
+//		System.out.println(Locale.UK);
+//		System.out.println(Locale.CHINA);
 		
 //		QueryResult qr = SqlQueryUtils.queryForStdAnswer(Locale.FRENCH, "something");
 //		QueryResult qr = SqlQueryUtils.queryForClientInfoByPrimaryID(10);

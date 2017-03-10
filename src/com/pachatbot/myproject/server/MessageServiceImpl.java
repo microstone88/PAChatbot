@@ -47,7 +47,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 	 */
 	@Override
 	public String connectToDB() {
-		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.basic_std_answers);
+		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.std_answers);
 		if (qr.isEmpty()) return "[INFO] The returned QueryResult is empty.\n"
 				+ "SQL = " + qr.getSql();
 		if (qr.isNull()) return "[WARN] The returned QueryResult is null due to query failure. "
@@ -74,7 +74,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 		if (qr.isNull()) return new Message("Oops! I'm stuck now. Please try later.");
 		
 		if (qr.isUniqueValue()) {
-			String response = (String) qr.getUniqueResult();
+			String response = (String) qr.getUniqueValue();
 			return new Message(response);
 		} else 
 			return new Message(qr.toString());
