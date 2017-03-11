@@ -793,7 +793,7 @@ public class PAChatbot implements EntryPoint {
 			public void onSuccess(Account result) {
 				// Verify the result
 				if (result.getUid() == 0) {
-					displayReceivedMsgBubble("Session expired! Please sign in again.");
+//					displayReceivedMsgBubble("Session expired! Please sign in again.");
 					loadViewBeforeLoginSuccessful();
 					return;
 				} else {
