@@ -17,8 +17,6 @@
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
-  <!-- <stylesheet src="../PAChatbot.css" /> -->
-
   <!-- Other module inherits                                      -->
 
   <!-- Specify the app entry point class.                         -->

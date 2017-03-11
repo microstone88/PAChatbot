@@ -2,6 +2,7 @@ package com.pachatbot.myproject.client;
 
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.pachatbot.myproject.shared.PreDefinedEnum.USERSTATUS;
 import com.pachatbot.myproject.shared.Bean.Account;
 
 
@@ -18,5 +19,7 @@ public interface SessionControlAsync {
 	void changePassword(String name, String newPassword, AsyncCallback<Boolean> callback);
 	
 	void loginFromSessionServer(AsyncCallback<Account> callback);
+	
+	void checkUserStatus(Account account, AsyncCallback<USERSTATUS> callback);
 	
 }

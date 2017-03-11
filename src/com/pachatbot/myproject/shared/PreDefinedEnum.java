@@ -15,7 +15,7 @@ public abstract class PreDefinedEnum {
 		fr_FR, zh_CN, en_US, en_GB;
 	}
 	
-	public enum STATUS implements Serializable {
+	public enum USERSTATUS implements Serializable {
 		active, offline;
 	}
 	

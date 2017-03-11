@@ -1,5 +1,7 @@
 package com.pachatbot.myproject.server;
 
+import java.util.Locale;
+
 import com.pachatbot.myproject.server.Database.DB;
 import com.pachatbot.myproject.server.Database.TABLES;
 
@@ -25,6 +27,8 @@ public class Test {
 		
 		QueryResult qrLogin = SqlQueryUtils.queryForClientLoginByUsername("admin", "Xiaohaier");
 		System.out.println(qrLogin.toString());
+		
+		System.out.println(Locale.FRANCE.toString());
 
 //		QueryResult qrInfo = SqlQueryUtils.queryForClientInfoByPrimaryID(1);
 //		System.out.println(qrInfo);

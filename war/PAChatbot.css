@@ -16,7 +16,15 @@ input.mobileSendButton, button.mobileSendButton {
   font-weight: normal;
 }
 
-.defaultTextFieldText {
+.normalDefaultTextFieldText {
+	color: #b3b3b3;
+}
+
+input.mobileTextFieldText {
+	font-size: 1.4em;
+}
+
+input.mobileDefaultTextFieldText {
 	color: #b3b3b3;
 }
 
@@ -31,7 +39,7 @@ input.mobileSendButton, button.mobileSendButton {
 }
 
 .mobileDisplayText {
-	font-size: 1.2em;
+	font-size: 1.4em;
 }
 
 .normalSentMessageText {

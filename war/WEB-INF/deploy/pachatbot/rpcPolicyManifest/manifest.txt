@@ -1,4 +1,4 @@
 # Module pachatbot
 # RPC service class, partial path of RPC policy file
-com.pachatbot.myproject.client.SessionControl, CC7EDA2F8836D3C2EB9D323C931C533B.gwt.rpc
+com.pachatbot.myproject.client.SessionControl, 19EAF8FF2859536A0DCBCB7A8D6D400C.gwt.rpc
 com.pachatbot.myproject.client.MessageService, 1C76DAE8C3115DD02FDB65124BC80372.gwt.rpc

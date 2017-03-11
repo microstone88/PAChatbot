@@ -9,7 +9,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.pachatbot.myproject.client.SessionControl;
 import com.pachatbot.myproject.server.Database.COLNAME;
 import com.pachatbot.myproject.shared.PreDefinedEnum.LOCALE;
-import com.pachatbot.myproject.shared.PreDefinedEnum.STATUS;
+import com.pachatbot.myproject.shared.PreDefinedEnum.USERSTATUS;
 import com.pachatbot.myproject.shared.Bean.Account;
 
 /**
@@ -52,7 +52,7 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 			re.setUid(uid);
 			re.setLastActive((Timestamp) qrLogin.getValue(1, COLNAME.lastactive.toString()));
 			re.setLastIP((String) qrLogin.getValue(1, COLNAME.lastip.toString()));
-			re.setStatus(STATUS.valueOf((String) qrLogin.getValue(1, COLNAME.status.toString())));
+			re.setStatus(USERSTATUS.valueOf((String) qrLogin.getValue(1, COLNAME.status.toString())));
 			
 			qrInfo = SqlQueryUtils.queryForClientInfoByPrimaryID(uid);
 			re.setFirstname((String) qrInfo.getValue(1, COLNAME.firstname.toString()));
@@ -65,6 +65,7 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 			storeUserInSession(re);
 		}
 		return re;
+		
 	}
 
 	@Override
@@ -90,7 +91,7 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 	 * @return an account object or null
 	 */
     private Account fetchUserFromSession() {
-        Account account = null;
+        Account account = new Account();
         HttpServletRequest httpServletRequest = this.getThreadLocalRequest();
         HttpSession session = httpServletRequest.getSession();
         Object userObj = session.getAttribute(USER_ACCOUNT);
@@ -119,5 +120,11 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
         HttpSession session = httpServletRequest.getSession();
         session.removeAttribute(USER_ACCOUNT);
     }
+
+	@Override
+	public USERSTATUS checkUserStatus(Account account) {
+		// TODO check user status
+		return null;
+	}
 
 }

@@ -33,7 +33,7 @@ abstract class SqlQueryUtils extends Database {
 //						+ " AND `locale` = \"" + locale_lang + "\"";
 		return Database.runQuery(sql);
 	}
-	
+
 	
 	static QueryResult queryForClientInfoByPrimaryID(Integer uid) {
 		sql = "SELECT " + COLNAME.locale + "," 
@@ -46,6 +46,7 @@ abstract class SqlQueryUtils extends Database {
 		return Database.runQuery(DB.clients, sql);
 	}
 	
+	
 	static QueryResult queryForClientLoginByUsername(String username, String password) {
 		sql = "SELECT * FROM `" + TABLES.login + "`"
 				+ " WHERE `" + COLNAME.username + "` = \"" + username + "\""
@@ -53,12 +54,14 @@ abstract class SqlQueryUtils extends Database {
 		return Database.runQuery(DB.clients, sql);
 	}
 	
+	
 	static QueryResult queryForClientLoginByUID(int uid, String password) {
 		sql = "SELECT * FROM `" + TABLES.login + "`"
 				+ " WHERE `" + COLNAME.uid + "` = " + uid + ""
 				+ " AND `" + COLNAME.password + "` = AES_ENCRYPT('" + password + "','" + Database.KEY_STR + "')";
 		return Database.runQuery(DB.clients, sql);
 	}
+	
 	
 	static QueryResult queryForClientInfoByEmail(String email) {
 		sql = "SELECT " + COLNAME.uid + ","
@@ -71,6 +74,7 @@ abstract class SqlQueryUtils extends Database {
 		return Database.runQuery(DB.clients, sql);
 	}
 	
+	
 	static QueryResult queryForClientInfoByCellphone(String cellphone) {
 		sql = "SELECT " + COLNAME.uid + ","
 						+ COLNAME.locale + "," 
@@ -79,6 +83,15 @@ abstract class SqlQueryUtils extends Database {
 						+ COLNAME.email 
 			+ " FROM `" + TABLES.info + "`"
 			+ " WHERE `" + COLNAME.cellphone + "` = \"" + cellphone + "\"";
+		return Database.runQuery(DB.clients, sql);
+	}
+	
+	
+	static QueryResult updateUserPasswdAES (String username, String passwd, String newPasswd) {
+		sql = "UPDATE `" + TABLES.login + "` "
+			+ "SET `" + COLNAME.password + "` = AES_ENCRYPT('" + newPasswd + "','" + Database.KEY_STR + "') "
+			+ "WHERE `" + COLNAME.username + "` = '" + username + "' "
+			+ "AND `" + COLNAME.password + "` = AES_ENCRYPT('" + passwd + "','" + Database.KEY_STR + "')";
 		return Database.runQuery(DB.clients, sql);
 	}
 	
