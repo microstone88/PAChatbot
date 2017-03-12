@@ -110,6 +110,7 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
         HttpServletRequest httpServletRequest = this.getThreadLocalRequest();
         HttpSession session = httpServletRequest.getSession(true);
         session.setAttribute(USER_ACCOUNT, account);
+        session.setMaxInactiveInterval(60*20);
     }
  
     /**
