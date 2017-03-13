@@ -121,11 +121,22 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
         HttpSession session = httpServletRequest.getSession();
         session.removeAttribute(USER_ACCOUNT);
     }
+    
+	@Override
+	public Account register(String firstname, String lastname, String email, String cellphone, String username,
+			String password) {
+		Account re = new Account();
+		
+		
+		return re;
+	}
 
 	@Override
 	public USERSTATUS checkUserStatus(Account account) {
 		// TODO check user status
 		return null;
 	}
+
+
 
 }

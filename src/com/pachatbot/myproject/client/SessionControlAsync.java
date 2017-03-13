@@ -20,6 +20,9 @@ public interface SessionControlAsync {
 	
 	void loginFromSessionServer(AsyncCallback<Account> callback);
 	
+	void register(String firstname, String lastname, String email, String cellphone,
+    		String username, String password, AsyncCallback<Account> callback);
+	
 	void checkUserStatus(Account account, AsyncCallback<USERSTATUS> callback);
 	
 }

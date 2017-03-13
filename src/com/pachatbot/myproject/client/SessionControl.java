@@ -21,6 +21,9 @@ public interface SessionControl extends RemoteService {
 	
     Account loginFromSessionServer();
     
+    Account register(String firstname, String lastname, String email, String cellphone,
+    		String username, String password);
+    
     USERSTATUS checkUserStatus(Account account);
     
 	/**

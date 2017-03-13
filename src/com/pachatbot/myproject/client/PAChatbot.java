@@ -70,11 +70,13 @@ public class PAChatbot implements EntryPoint {
 	}
 	
 	private static final String[] DEFAULT_TEXT = {"username or email or cellphone",
-			"password", "first name", "last name", "email address", "cellphone number",
+			"password", "first name", "last name", 
+			"email address (optional)", "cellphone number (optional)",
 			"username", "password"};
 	
 	private static final String[] TITLE_TEXT = {"username or email or cellphone",
-			"password", "first name", "last name", "email address", "cellphone number",
+			"password", "first name", "last name", 
+			"email address (optional)", "cellphone number (optional)",
 			"username", "password"};
 	
 	private static final int FADING_DURATION = 500;
@@ -507,6 +509,7 @@ public class PAChatbot implements EntryPoint {
 			@Override
 			public void onKeyUp(KeyUpEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					pwField.setFocus(false);
 					login();
 				}
 			}
@@ -519,11 +522,22 @@ public class PAChatbot implements EntryPoint {
 			private void login() {
 				String identifier = usrField.getText();
 				String password = pwField.getText();
+				
+				// Check if empty or default, do nothing
+				if (identifier.trim().length() < 1 || password.trim().length() < 1
+						|| usrField.getStyleName().toLowerCase().contains("default")
+						|| pwField.getStyleName().toLowerCase().contains("default")) {
+					return;
+				}
+				
+				// Check if valid, send a warning message
 				if (!FieldVerifier.isValidUserForSignIn(identifier) 
 						|| !FieldVerifier.Password.isValid(password)) {
 					displayReceivedMsgBubble("Invalid username or password!");
 					return;
 				}
+				
+				// Verify the combination
 				SessionControl.Utils.getInstance().login(identifier, password, 
 						new AsyncCallback<Account>() {
 					
@@ -561,6 +575,104 @@ public class PAChatbot implements EntryPoint {
 		final SignInActionHandler signInHandler = new SignInActionHandler();
 		signInButton.addClickHandler(signInHandler);
 		pwField.addKeyUpHandler(signInHandler);
+		
+		class SignUpActionHandler implements ClickHandler, KeyUpHandler {
+
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+					newPwField.setFocus(false);
+					if (agreeCheck.getValue()) 
+						register();
+				}
+			}
+
+			@Override
+			public void onClick(ClickEvent event) {
+				register();
+			}
+			
+			private void register() {
+				String first_name = fstNameField.getText().trim();
+				String last_name = lastNameField.getText().trim();
+				String new_username = newUsrField.getText();
+				String new_password = newPwField.getText();
+				
+				String[] mandatory = {first_name, last_name, new_username, new_password};
+				
+				// mandatory fields should not be empty
+				for (String str : mandatory) {
+					if (str.length() < 1) return;
+				}
+				
+				// mandatory fields should not be "default"
+				if (fstNameField.getStyleName().toLowerCase().contains("default")
+						|| lastNameField.getStyleName().toLowerCase().contains("default")
+						|| newUsrField.getStyleName().toLowerCase().contains("default")
+						|| newPwField.getStyleName().toLowerCase().contains("default")) {
+					return;
+				}
+				
+				// Validate the mandatory fields
+				if (!FieldVerifier.Firstname.isValid(first_name)
+						|| !FieldVerifier.Lastname.isValid(last_name)
+						|| !FieldVerifier.Username.isValid(new_username)
+						|| !FieldVerifier.Password.isValid(new_password)) {
+					displayReceivedMsgBubble("Invalid inputs!");
+					return;
+				}
+				
+				String email_address = emailField.getText().trim();
+				String cell_number = cellphoneField.getText().trim();
+				
+				// if optional fields are "default", set their values as empty string
+				if (emailField.getStyleName().toLowerCase().contains("default"))
+					email_address = "";
+				if (cellphoneField.getStyleName().toLowerCase().contains("default"))
+					cell_number = "";
+				
+				// register new user in database
+				SessionControl.Utils.getInstance().register(first_name, last_name, 
+						email_address, cell_number, 
+						new_username, new_password, 
+						new AsyncCallback<Account>() {
+					
+					@Override
+					public void onSuccess(Account result) {
+						// Verify the result
+						if (result.getUid() == 0) {
+							displayReceivedMsgBubble("Ummm... maybe try again?");
+							return;
+						}
+						
+						// Clear bubbles
+//						bubbleLayout.clear();
+						
+						// Load view after successfully logged in
+						loadLoginSuccessfulView(result);
+						
+						// Reset panels
+						resetSignInPanel(showPwCheck, usrField, pwField);
+						resetRegisterPanel(showNewPwCheck, agreeCheck, 
+								fstNameField, lastNameField,
+								emailField, cellphoneField,
+								newUsrField, newPwField);
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
+					}
+				});
+				
+			}
+			
+		}
+		
+		final SignUpActionHandler signUpHandler = new SignUpActionHandler();
+		signUpButton.addClickHandler(signUpHandler);
+		newPwField.addKeyUpHandler(signUpHandler);
+		
 		
 		forgotPwButton.addClickHandler(new ClickHandler() {
 			
@@ -606,7 +718,6 @@ public class PAChatbot implements EntryPoint {
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
 				if (agreeCheck.getValue()) signUpButton.setEnabled(true);
 				else signUpButton.setEnabled(false);
-				
 			}
 		});
 		
@@ -780,53 +891,53 @@ public class PAChatbot implements EntryPoint {
 					// if not empty, validate the content
 					else {
 						switch (index) {
-						case 0: // username or email or cellphone
+						case 0: //username or email or cellphone
 							if (!FieldVerifier.isValidUserForSignIn(currentText))
 								displayReceivedMsgBubble("This may not be a valid username or email address or cellphone number.");
 							break;
 
-						case 1:
+						case 1: //password
 							if (!FieldVerifier.Password.isValid(currentText))
 								displayReceivedMsgBubble("Your password is invalid.");
 							break;
 							
-						case 2:
+						case 2: //first name
 							if (currentText.trim().length() > 30)
 								displayReceivedMsgBubble("Your first name is too long. It should contain no more than 30 characters.");
 							else if (!FieldVerifier.Firstname.isValid(currentText))
 								displayReceivedMsgBubble("Your first name should contain only letters, spaces and ’.'-");
 							break;
 							
-						case 3:
+						case 3: //last name
 							if (currentText.trim().length() > 60)
-								displayReceivedMsgBubble("Your first name is too long. It should contain no more than 60 characters.");
+								displayReceivedMsgBubble("Your last name is too long. It should contain no more than 60 characters.");
 							else if (!FieldVerifier.Lastname.isValid(currentText))
 								displayReceivedMsgBubble("Your last name should contain only letters, spaces and ’.'-");
 							break;
 						
-						case 4:
+						case 4: //email address
 							if (!FieldVerifier.Email.isValid(currentText))
-								displayReceivedMsgBubble("Your email address is invalid.");
+								displayReceivedMsgBubble("This is not a valid email address.");
 							break;
 						
-						case 5:
+						case 5: //cellphone number
 							if (!FieldVerifier.Cellphone.isValid(currentText))
-								displayReceivedMsgBubble("Your cellphone number is invalid.");
+								displayReceivedMsgBubble("This is not a valid cellphone number.");
 							break;
 						
-						case 6:
-							if (currentText.trim().length() < 5) 
+						case 6: // username
+							if (currentText.length() < 5) 
 								displayReceivedMsgBubble("Your username must contain at least 5 characters.");
-							else if (currentText.trim().length() > 20)
+							else if (currentText.length() > 20)
 								displayReceivedMsgBubble("Your username must have at most 20 characters.");
 							else if (!FieldVerifier.Username.isValid(currentText))
 								displayReceivedMsgBubble("Your username should contain only letters, numbers, \"_\" and \"-\".");
 							break;
 						
-						case 7:
-							if (currentText.trim().length() < 8) 
+						case 7: //password
+							if (currentText.length() < 8) 
 								displayReceivedMsgBubble("Your password must contain at least 8 characters.");
-							else if (currentText.trim().length() > 30)
+							else if (currentText.length() > 30)
 								displayReceivedMsgBubble("Your password must have at most 30 characters.");
 							else if (!FieldVerifier.Password.isValid(currentText))
 								displayReceivedMsgBubble("Your password should contain only letters, numbers, \"_\" and \"-\".");
@@ -908,6 +1019,7 @@ public class PAChatbot implements EntryPoint {
 
 					@Override
 					public void onSuccess(Void result) {
+//						bubbleLayout.clear();
 						displayReceivedMsgBubble("See you later, then!");
 						if (IS_MOBILE) stackLayout.remove(optionsScrollPanel);
 						else accountPanel.clear();

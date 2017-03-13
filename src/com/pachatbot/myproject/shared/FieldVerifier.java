@@ -41,29 +41,29 @@ public class FieldVerifier {
 	public static class Email extends FieldVerifier {
 		public Email(){}
 		public static boolean isValid(String email) {
-	        return email.matches("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$");
+	        return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
 		}
 	}
 	
 	public static class Firstname extends FieldVerifier {
 		public Firstname(){}
-		public static boolean isValid(String cellphone) {
+		public static boolean isValid(String firstname) {
 			/**
 			 * \\p{L} is a Unicode Character Property that 
 			 * matches any kind of letter from any language.
 			 */
-			return cellphone.matches("^[\\p{L} .’'-]+$"); 
+			return firstname.matches("^[a-zA-Z\u00C0-\u017F ’.'-]+$"); 
 		}
 	}
 	
 	public static class Lastname extends FieldVerifier {
 		public Lastname(){}
-		public static boolean isValid(String cellphone) {
+		public static boolean isValid(String lastname) {
 			/**
 			 * \\p{L} is a Unicode Character Property that 
 			 * matches any kind of letter from any language.
 			 */
-			return cellphone.matches("^[\\p{L} .’'-]+$"); 
+			return lastname.matches("^[a-zA-Z\u00C0-\u017F ’.'-]+$"); 
 		}
 	}
 
