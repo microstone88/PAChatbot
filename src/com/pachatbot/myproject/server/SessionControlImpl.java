@@ -28,7 +28,7 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 	@Override
 	public Account login(String identifier, String password) {
 		
-		int uid = 0; Account re = new Account();
+		long uid = 0; Account re = new Account();
 		QueryResult qrInfo = new QueryResult();
 		
 		// Try "identifier" as user name
@@ -42,13 +42,13 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 			
 			if (!qrInfo_e.isEmpty() || !qrInfo_c.isEmpty()) {
 				qrInfo = (!qrInfo_e.isEmpty()) ? qrInfo_e : qrInfo_c;
-				uid = (int) qrInfo.getValue(1, COLNAME.uid.toString());
+				uid = (long) qrInfo.getValue(1, COLNAME.uid.toString());
 				qrLogin = SqlQueryUtils.queryForClientLoginByUID(uid, password);
 			} else return re; // return empty account
 		}
 		
 		if (qrLogin.isUniqueRow()) {
-			uid = (int) qrLogin.getValue(1, COLNAME.uid.toString());
+			uid = (long) qrLogin.getValue(1, COLNAME.uid.toString());
 			re.setUid(uid);
 			re.setLastActive((Timestamp) qrLogin.getValue(1, COLNAME.lastactive.toString()));
 			re.setLastIP((String) qrLogin.getValue(1, COLNAME.lastip.toString()));
@@ -110,7 +110,7 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
         HttpServletRequest httpServletRequest = this.getThreadLocalRequest();
         HttpSession session = httpServletRequest.getSession(true);
         session.setAttribute(USER_ACCOUNT, account);
-        session.setMaxInactiveInterval(60*20);
+        session.setMaxInactiveInterval(60*20); // for 20 minutes
     }
  
     /**
@@ -125,9 +125,26 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 	@Override
 	public Account register(String firstname, String lastname, String email, String cellphone, String username,
 			String password) {
-		Account re = new Account();
 		
-		
+		long uid = 0; Account re = new Account();
+		QueryResult qrLogin = SqlQueryUtils.insertNewClientLogin(username, password, "user");
+		if (qrLogin.isUniqueRow()) {
+			uid = (long) qrLogin.getValue(1, COLNAME.uid.toString());
+			re.setUid(uid);
+			re.setLastActive((Timestamp) qrLogin.getValue(1, COLNAME.lastactive.toString()));
+			re.setLastIP((String) qrLogin.getValue(1, COLNAME.lastip.toString()));
+			re.setStatus(USERSTATUS.valueOf((String) qrLogin.getValue(1, COLNAME.status.toString())));
+			
+			QueryResult qrInfo = SqlQueryUtils.insertNewClientInfo(uid, firstname, lastname, email, cellphone, "fr_FR");
+			re.setFirstname((String) qrInfo.getValue(1, COLNAME.firstname.toString()));
+			re.setLastname((String) qrInfo.getValue(1, COLNAME.lastname.toString()));
+			re.setEmail((String) qrInfo.getValue(1, COLNAME.email.toString()));
+			re.setCellphone((String) qrInfo.getValue(1, COLNAME.cellphone.toString()));
+			re.setLocale(LOCALE.valueOf((String) qrInfo.getValue(1, COLNAME.locale.toString())));
+			
+			// store the account/session identification
+			storeUserInSession(re);
+		}
 		return re;
 	}
 

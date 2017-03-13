@@ -5,15 +5,19 @@
   padding: 3px;
 }
 
-input.normalSendButton, button.normalSendButton {
+.errorTextField {
+	color: red;
+	border-color: red !important;
+}
+
+input.normalButton, button.normalButton {
   display: block;
   font-size: 1.2em;
 }
 
-input.mobileSendButton, button.mobileSendButton {
+input.mobileButton, button.mobileButton {
   display: block;
   font-size: 1.4em;
-  font-weight: normal;
 }
 
 .normalDefaultTextFieldText {
@@ -28,11 +32,13 @@ input.mobileDefaultTextFieldText {
 	color: #b3b3b3;
 }
 
-.disclosurePanelHeader {
-	/* color: #3995d6; */
+/* .disclosurePanelHeader .header {
+	color: #3995d6 !important;
+	font: fantasy;
+	text-shadow: gray; */
 	/* font-weight: bold; */
-	/* background-color: #3995d6; */
-}
+	/* background-color: #3995d6;
+} */
 
 .normalDisplayText {
 	font-size: 1.0em
@@ -90,6 +96,11 @@ input.mobileDefaultTextFieldText {
 	padding-top: .3em;
 	padding-left: .6em;
 	padding-bottom: .3em;
+}
+
+.customVerticalPanel {
+	padding-left: 0px;
+	padding-right: 10px;
 }
 
 .gwt-DecoratorPanel {

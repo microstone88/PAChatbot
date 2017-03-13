@@ -78,7 +78,7 @@ abstract class Database {
 		WeChat ("wechat"), PayPal ("paypal"), Alipay ("alipay"),
 		
 		// From table "clients_login"
-		uid ("uid"), username ("usr_name"), password ("passwd"), group ("group"), 
+		uid ("uid"), username ("usr_name"), password ("passwd"), group ("usergroup"), 
 		createdat ("created_at"), lastactive ("last_active"), lastip ("last_ip"), status ("status");	
 
 		
@@ -198,8 +198,8 @@ abstract class Database {
 	 * @param sql an SQL statement to be sent to the database
 	 * @return a {@link QueryResult} object that contains the data produced by the given query.
 	 */
-	static QueryResult runQuery(String sql) {
-		return runQuery(DB.basic, sql);
+	static QueryResult executeQuery(String sql) {
+		return executeQuery(DB.basic, sql);
 	}
 	
 	/**
@@ -210,7 +210,7 @@ abstract class Database {
 	 * @return a {@link QueryResult} object that contains the data produced by the given query.
 	 * Never null.
 	 */
-	static QueryResult runQuery(DB db, String sql) {
+	static QueryResult executeQuery(DB db, String sql) {
 		
 		QueryResult re = new QueryResult();
 		re.setSql(sql);
@@ -229,5 +229,37 @@ abstract class Database {
 		}
 		return re;
 	}
+	
+	/**
+	 * 
+	 * @param db
+	 * @param dml an SQL Data Manipulation Language (DML) statement, 
+	 * such as INSERT or UPDATE (not DELETE)
+	 * @param sql
+	 * @return
+	 */
+	static QueryResult executeUpdateAndGetPrimaryID(DB db, String dml, String sql) {
+		
+		QueryResult re = new QueryResult();
+		re.setSql(sql);
+		int count = -1;
+		try (
+			Connection conn = getConnection(db);
+//			Connection conn = getJNDIConnection();
+			Statement stmt = conn.createStatement();
+		) {
+			count = stmt.executeUpdate(dml);
+			if (count == 1) re = new QueryResult(stmt.executeQuery(sql));
+		} catch (SQLException e) {
+			System.err.println("[ERROR] SQL query error occurred during \"" + sql + "\"");
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			System.err.println("[ERROR] Failed to execute SQL query due to connection failure.");
+//			e.printStackTrace();
+		}
+		return re;
+	}
+	
+	
 
 }

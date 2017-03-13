@@ -29,7 +29,7 @@ public class Account implements Serializable {
 	 *  the current user should NEVER be transfered 
 	 *  to the client side. 
 	 */
-	private int uid = 0;
+	private long uid = 0;
 	
 //	private String username;
 //	private String password;
@@ -103,14 +103,14 @@ public class Account implements Serializable {
 	/**
 	 * @return the uid
 	 */
-	public int getUid() {
+	public long getUid() {
 		return uid;
 	}
 
 	/**
 	 * @param uid the uid to set
 	 */
-	public void setUid(int uid) {
+	public void setUid(long uid) {
 		this.uid = uid;
 	}
 
