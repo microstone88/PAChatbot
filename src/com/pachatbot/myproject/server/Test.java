@@ -1,9 +1,7 @@
 package com.pachatbot.myproject.server;
 
-import java.util.Locale;
-
-import com.pachatbot.myproject.server.Database.DB;
-import com.pachatbot.myproject.server.Database.TABLES;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class Test {
 
@@ -22,13 +20,20 @@ public class Test {
 		
 //		MySqlUtils.testQuery();
 		
-		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.clients, TABLES.login);
-		System.out.println(qr);
+//		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.CLIENTS, Tables.CLOGIN);
+//		System.out.println(qr);
 		
-		QueryResult qrLogin = SqlQueryUtils.queryForClientLoginByUsername("admin", "Xiaohaier");
-		System.out.println(qrLogin.toString());
+//		QueryResult qrLogin = SqlQueryUtils.queryForClientLoginByUsername("admin", "Xiaohaier");
+//		System.out.println(qrLogin.toString());
 		
-		System.out.println(Locale.FRANCE.toString());
+//		System.out.println(Locale.FRANCE.toString());
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		
+		System.out.println(timestamp);
+		System.out.println(formatter.format(timestamp));
+		
 
 //		QueryResult qrInfo = SqlQueryUtils.queryForClientInfoByPrimaryID(1);
 //		System.out.println(qrInfo);

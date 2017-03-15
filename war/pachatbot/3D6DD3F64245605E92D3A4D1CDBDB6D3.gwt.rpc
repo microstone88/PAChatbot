@@ -3,9 +3,10 @@ com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException, true, true, t
 com.google.gwt.user.client.rpc.RpcTokenException, true, true, false, false, com.google.gwt.user.client.rpc.RpcTokenException/2345075298, 2345075298
 com.google.gwt.user.client.rpc.XsrfToken, false, false, true, true, com.google.gwt.user.client.rpc.XsrfToken/4254043109, 4254043109
 com.pachatbot.myproject.client.SessionControl, false, false, false, false, _, 3814745805
-com.pachatbot.myproject.shared.Bean.Account, true, true, true, true, com.pachatbot.myproject.shared.Bean.Account/3921750464, 3921750464
-com.pachatbot.myproject.shared.PreDefinedEnum$LOCALE, true, true, true, true, com.pachatbot.myproject.shared.PreDefinedEnum$LOCALE/3791138394, 3791138394
-com.pachatbot.myproject.shared.PreDefinedEnum$USERSTATUS, true, true, true, true, com.pachatbot.myproject.shared.PreDefinedEnum$USERSTATUS/393912612, 393912612
+com.pachatbot.myproject.shared.Bean.Account, true, true, true, true, com.pachatbot.myproject.shared.Bean.Account/2267924879, 2267924879
+com.pachatbot.myproject.shared.PreDefinedEnum$UGroup, true, true, true, true, com.pachatbot.myproject.shared.PreDefinedEnum$UGroup/3866228840, 3866228840
+com.pachatbot.myproject.shared.PreDefinedEnum$ULocale, true, true, true, true, com.pachatbot.myproject.shared.PreDefinedEnum$ULocale/2866009031, 2866009031
+com.pachatbot.myproject.shared.PreDefinedEnum$UStatus, true, true, true, true, com.pachatbot.myproject.shared.PreDefinedEnum$UStatus/2341363928, 2341363928
 java.lang.Exception, true, false, true, false, java.lang.Exception/1920171873, 1920171873
 java.lang.RuntimeException, true, false, true, false, java.lang.RuntimeException/515124647, 515124647
 java.lang.String, true, true, true, true, java.lang.String/2004016611, 2004016611

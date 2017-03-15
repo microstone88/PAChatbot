@@ -3,7 +3,7 @@ package com.pachatbot.myproject.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.pachatbot.myproject.shared.PreDefinedEnum.USERSTATUS;
+import com.pachatbot.myproject.shared.PreDefinedEnum.UStatus;
 import com.pachatbot.myproject.shared.Bean.Account;
 
 /**
@@ -15,16 +15,16 @@ public interface SessionControl extends RemoteService {
 	
 	Account login(String name, String password);
 	
-	void logout();
+	void logout(long uid);
 	
-	boolean changePassword(String name, String newPassword);
+	boolean changePassword(long uid, String oldPasswd, String newPasswd);
 	
     Account loginFromSessionServer();
     
     Account register(String firstname, String lastname, String email, String cellphone,
     		String username, String password);
     
-    USERSTATUS checkUserStatus(Account account);
+    UStatus checkUserStatus(Account account);
     
 	/**
 	 * Utility class for simplifying access to the instance of async service.

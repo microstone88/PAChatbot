@@ -11,16 +11,18 @@ public abstract class PreDefinedEnum {
 	 * @author micro
 	 *
 	 */
-	public enum LOCALE implements Serializable {
+	public enum ULocale implements Serializable {
 		fr_FR, zh_CN, en_US, en_GB;
 	}
 	
-	public enum USERSTATUS implements Serializable {
-		active, offline;
+	public enum UStatus implements Serializable {
+		active, offline, expired;
+		
 	}
 	
-	public enum USERGROUP implements Serializable {
+	public enum UGroup implements Serializable {
 		admin, user, guest;
+		
 	}
 	
 	

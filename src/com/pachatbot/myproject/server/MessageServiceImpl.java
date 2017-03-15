@@ -8,7 +8,7 @@ import java.util.Locale;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.pachatbot.myproject.client.MessageService;
 import com.pachatbot.myproject.server.Database.DB;
-import com.pachatbot.myproject.server.Database.TABLES;
+import com.pachatbot.myproject.server.Database.Tables;
 import com.pachatbot.myproject.shared.Bean.Message;
 
 /**
@@ -47,7 +47,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 	 */
 	@Override
 	public String connectToDB() {
-		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.basic, TABLES.std_answers);
+		QueryResult qr = SqlQueryUtils.selectAllFromTable(DB.BASIC, Tables.STDANS);
 		if (qr.isEmpty()) return "[INFO] The returned QueryResult is empty.\n"
 				+ "SQL = " + qr.getSql();
 		if (qr.isNull()) return "[WARN] The returned QueryResult is null due to query failure. "

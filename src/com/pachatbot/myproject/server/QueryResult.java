@@ -121,6 +121,16 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 	/**
 	 * get the object at the given row and the specified column.
 	 * @param row starts from "1"
+	 * @param column an existing column
+	 * @return the object
+	 */
+	public Object getValue(int row, @SuppressWarnings("rawtypes") Enum column) {
+		return this.getValue(row, column.toString());
+	}
+	
+	/**
+	 * get the object at the given row and the specified column.
+	 * @param row starts from "1"
 	 * @param colname an existing column name
 	 * @return the object
 	 */
@@ -134,7 +144,6 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 		while (r++ < row) targetRow = it.next();
 		return targetRow.get(colname);
 	}
-	
 	
 	/**
 	 * this can be used to check if the query has been successfully executed.
@@ -241,6 +250,5 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 	public void setSql(String sql) {
 		this.sql = sql;
 	}
-	
-	
+
 }

@@ -7,9 +7,11 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.pachatbot.myproject.client.SessionControl;
-import com.pachatbot.myproject.server.Database.COLNAME;
-import com.pachatbot.myproject.shared.PreDefinedEnum.LOCALE;
-import com.pachatbot.myproject.shared.PreDefinedEnum.USERSTATUS;
+import com.pachatbot.myproject.server.Database.TInfo;
+import com.pachatbot.myproject.server.Database.TLogin;
+import com.pachatbot.myproject.shared.PreDefinedEnum.ULocale;
+import com.pachatbot.myproject.shared.PreDefinedEnum.UGroup;
+import com.pachatbot.myproject.shared.PreDefinedEnum.UStatus;
 import com.pachatbot.myproject.shared.Bean.Account;
 
 /**
@@ -30,58 +32,118 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 		
 		long uid = 0; Account re = new Account();
 		QueryResult qrInfo = new QueryResult();
+		QueryResult qrLogin = new QueryResult();
 		
-		// Try "identifier" as user name
-		QueryResult qrLogin = SqlQueryUtils.queryForClientLoginByUsername(identifier, password);
-		
-		if (qrLogin.isEmpty()) {
+		if (identifier.contains("@")) {
 			
-			// Try "identifier" as email address or cellphone number
-			QueryResult qrInfo_e = SqlQueryUtils.queryForClientInfoByEmail(identifier);
-			QueryResult qrInfo_c = SqlQueryUtils.queryForClientInfoByCellphone(identifier);
-			
-			if (!qrInfo_e.isEmpty() || !qrInfo_c.isEmpty()) {
-				qrInfo = (!qrInfo_e.isEmpty()) ? qrInfo_e : qrInfo_c;
-				uid = (long) qrInfo.getValue(1, COLNAME.uid.toString());
+			// Try "identifier" as email address
+			qrInfo = SqlQueryUtils.queryForClientInfoByEmail(identifier);
+			if (qrInfo.isUniqueRow()) {
+				uid = (long) qrInfo.getValue(1, TInfo.Column.UID);
+				// Verify password
 				qrLogin = SqlQueryUtils.queryForClientLoginByUID(uid, password);
-			} else return re; // return empty account
+			}
+			// email not unique or doesn't exist (login not successful!)
+			else return re;
+		
+		} else {
+			
+			// Try "identifier" as cellphone number
+			qrInfo = SqlQueryUtils.queryForClientInfoByCellphone(identifier);
+			if (qrInfo.isUniqueRow()) {
+				uid = (long) qrInfo.getValue(1, TInfo.Column.UID);
+				// Verify password
+				qrLogin = SqlQueryUtils.queryForClientLoginByUID(uid, password);
+			}
+			
+			// cellphone number not unique or doesn't exist
+			else { 
+				// Try "identifier" as username and verify password
+				qrLogin = SqlQueryUtils.queryForClientLoginByUsername(identifier, password);
+			}
 		}
 		
+		if (!qrLogin.isUniqueRow()) return re; // wrong cellphone or combination (not successful!)
+		// If password is verified
+		else {
+			uid = (long) qrLogin.getValue(1, TLogin.Column.UID);
+			// If the provided "identifier" is username
+			if (!qrInfo.isUniqueRow()) 
+				qrInfo = SqlQueryUtils.queryForClientInfoByPrimaryID(uid); // uid is always unique
+			// Combine the query results from the two tables (both have unique row)
+			re = combine(qrLogin, qrInfo);
+			// Store the account/session identification
+			storeUserInSession(re);
+			// Update user status
+			String ip_server = this.getThreadLocalRequest().getRemoteAddr();
+			SqlQueryUtils.updateUserStatus(uid, ip_server, UStatus.active);
+		}
+		return re;
+	}
+	
+	@Override
+	public Account register(String firstname, String lastname, String email, String cellphone, String username,
+			String password) {
+		
+		Account re = new Account();
+		QueryResult qrLogin = SqlQueryUtils.insertNewClientLogin(username, password, UGroup.user);
+		
 		if (qrLogin.isUniqueRow()) {
-			uid = (long) qrLogin.getValue(1, COLNAME.uid.toString());
-			re.setUid(uid);
-			re.setLastActive((Timestamp) qrLogin.getValue(1, COLNAME.lastactive.toString()));
-			re.setLastIP((String) qrLogin.getValue(1, COLNAME.lastip.toString()));
-			re.setStatus(USERSTATUS.valueOf((String) qrLogin.getValue(1, COLNAME.status.toString())));
-			
-			qrInfo = SqlQueryUtils.queryForClientInfoByPrimaryID(uid);
-			re.setFirstname((String) qrInfo.getValue(1, COLNAME.firstname.toString()));
-			re.setLastname((String) qrInfo.getValue(1, COLNAME.lastname.toString()));
-			re.setEmail((String) qrInfo.getValue(1, COLNAME.email.toString()));
-			re.setCellphone((String) qrInfo.getValue(1, COLNAME.cellphone.toString()));
-			re.setLocale(LOCALE.valueOf((String) qrInfo.getValue(1, COLNAME.locale.toString())));
+			long uid = (long) qrLogin.getValue(1, TLogin.Column.UID);
+			QueryResult qrInfo = SqlQueryUtils.insertNewClientInfo(uid, firstname, lastname, email, cellphone, "fr_FR");
+			re = combine(qrLogin, qrInfo);
 			
 			// store the account/session identification
 			storeUserInSession(re);
 		}
 		return re;
-		
+	}
+	
+	private Account combine(QueryResult qrLogin, QueryResult qrInfo) {
+		Account re = new Account();
+		long uid_l = (long) qrLogin.getValue(1, TLogin.Column.UID);
+		long uid_i = (long) qrInfo.getValue(1, TInfo.Column.UID);
+		if (uid_l == uid_i) {
+			re.setUid(uid_l);
+			re.setLastActive((Timestamp) qrLogin.getValue(1, TLogin.Column.LASTACT));
+			re.setLastIP((String) qrLogin.getValue(1, TLogin.Column.LASTIP));
+			re.setStatus(UStatus.valueOf((String) qrLogin.getValue(1, TLogin.Column.STATUS)));
+			re.setGroup(UGroup.valueOf((String) qrLogin.getValue(1, TLogin.Column.GROUP)));
+			
+			re.setFirstname((String) qrInfo.getValue(1, TInfo.Column.FIRSTNAME));
+			re.setLastname((String) qrInfo.getValue(1, TInfo.Column.LASTNAME));
+			re.setEmail((String) qrInfo.getValue(1, TInfo.Column.EMAIL));
+			re.setCellphone((String) qrInfo.getValue(1, TInfo.Column.CELLPHONE));
+			re.setLocale(ULocale.valueOf((String) qrInfo.getValue(1, TInfo.Column.LOCALE)));
+		}
+		else throw new IllegalArgumentException("uid dosen't match! login uid = " + uid_l + ", info uid = " + uid_i);
+		return re;
 	}
 
 	@Override
-	public void logout() {
+	public void logout(long uid) {
+		// Update user status
+		String ip_server = this.getThreadLocalRequest().getRemoteAddr();
+		SqlQueryUtils.updateUserStatus(uid, ip_server, UStatus.offline);
 		deleteUserFromSession();
 	}
 
 	@Override
-	public boolean changePassword(String name, String newPassword) {
-		// TODO change password logic
-		return false;
+	public boolean changePassword(long uid, String oldPasswd, String newPasswd) {
+		int row_count = SqlQueryUtils.updateUserPasswd(uid, oldPasswd, newPasswd);
+		if (row_count == 1) return true;
+		else return false;
 	}
 
 	@Override
 	public Account loginFromSessionServer() {
 		return fetchUserFromSession();
+	}
+	
+	@Override
+	public UStatus checkUserStatus(Account account) {
+		// TODO check user status
+		return null;
 	}
 	
 	/**
@@ -122,38 +184,6 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
         session.removeAttribute(USER_ACCOUNT);
     }
     
-	@Override
-	public Account register(String firstname, String lastname, String email, String cellphone, String username,
-			String password) {
-		
-		long uid = 0; Account re = new Account();
-		QueryResult qrLogin = SqlQueryUtils.insertNewClientLogin(username, password, "user");
-		if (qrLogin.isUniqueRow()) {
-			uid = (long) qrLogin.getValue(1, COLNAME.uid.toString());
-			re.setUid(uid);
-			re.setLastActive((Timestamp) qrLogin.getValue(1, COLNAME.lastactive.toString()));
-			re.setLastIP((String) qrLogin.getValue(1, COLNAME.lastip.toString()));
-			re.setStatus(USERSTATUS.valueOf((String) qrLogin.getValue(1, COLNAME.status.toString())));
-			
-			QueryResult qrInfo = SqlQueryUtils.insertNewClientInfo(uid, firstname, lastname, email, cellphone, "fr_FR");
-			re.setFirstname((String) qrInfo.getValue(1, COLNAME.firstname.toString()));
-			re.setLastname((String) qrInfo.getValue(1, COLNAME.lastname.toString()));
-			re.setEmail((String) qrInfo.getValue(1, COLNAME.email.toString()));
-			re.setCellphone((String) qrInfo.getValue(1, COLNAME.cellphone.toString()));
-			re.setLocale(LOCALE.valueOf((String) qrInfo.getValue(1, COLNAME.locale.toString())));
-			
-			// store the account/session identification
-			storeUserInSession(re);
-		}
-		return re;
-	}
-
-	@Override
-	public USERSTATUS checkUserStatus(Account account) {
-		// TODO check user status
-		return null;
-	}
-
 
 
 }

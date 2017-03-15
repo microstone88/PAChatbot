@@ -5,8 +5,9 @@ package com.pachatbot.myproject.shared.Bean;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import com.pachatbot.myproject.shared.PreDefinedEnum.LOCALE;
-import com.pachatbot.myproject.shared.PreDefinedEnum.USERSTATUS;
+import com.pachatbot.myproject.shared.PreDefinedEnum.ULocale;
+import com.pachatbot.myproject.shared.PreDefinedEnum.UGroup;
+import com.pachatbot.myproject.shared.PreDefinedEnum.UStatus;
 
 /**
  * This bean object can be used to transfer the information 
@@ -36,20 +37,18 @@ public class Account implements Serializable {
 	
 	private String firstname;
 	private String lastname;
-	
 	private String email;
 	private String cellphone;
 	
 	private String lastIP;
 	private Timestamp lastActive;
 	
-	private LOCALE locale;
-	private USERSTATUS status;
+	private ULocale locale;
+	private UStatus status;
+	private UGroup group;
 	
 	
 //	private Locale javaLocale; // Need to customize the serialization (and it dosen't work!).
-	
-	private static final int LOCAL_VARS_COUNT = 9;
 	
 	/**
 	 * An empty account will return "uid = 0".
@@ -64,24 +63,6 @@ public class Account implements Serializable {
 //		this.setPassword(password);
 	}
 	
-	public Account(String... str) {
-		if (str.length != LOCAL_VARS_COUNT)
-			throw new IllegalArgumentException(
-					"Expected: " + LOCAL_VARS_COUNT + "length: " + str.length);
-		else {
-			this.setUid(Integer.valueOf(str[0]));
-			this.setFirstname(str[1]);
-			this.setLastname(str[2]);
-			this.setLocale(LOCALE.valueOf(str[3]));
-			this.setEmail(str[4]);
-			this.setCellphone(str[5]);
-			this.setLastActive(Timestamp.valueOf(str[6]));
-			this.setLastIP(str[7]);
-			this.setStatus(USERSTATUS.valueOf(str[8]));
-//			String[] loc = str[9].split("_");
-//			this.setJavaLocale(new Locale(loc[0], loc[1]));
-		}
-	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -96,7 +77,8 @@ public class Account implements Serializable {
 				+ this.getCellphone() + "||"
 				+ this.getLastActive() + "||" 
 				+ this.getLastIP() + "||" 
-				+ this.getStatus();
+				+ this.getStatus() + "||"
+				+ this.getGroup();
 //				+ this.getJavaLocale();
 	}
 
@@ -230,29 +212,43 @@ public class Account implements Serializable {
 	/**
 	 * @return the locale
 	 */
-	public LOCALE getLocale() {
+	public ULocale getLocale() {
 		return locale;
 	}
 
 	/**
 	 * @param locale the locale to set
 	 */
-	public void setLocale(LOCALE locale) {
+	public void setLocale(ULocale locale) {
 		this.locale = locale;
 	}
 
 	/**
 	 * @return the status
 	 */
-	public USERSTATUS getStatus() {
+	public UStatus getStatus() {
 		return status;
 	}
 
 	/**
 	 * @param status the status to set
 	 */
-	public void setStatus(USERSTATUS status) {
+	public void setStatus(UStatus status) {
 		this.status = status;
+	}
+
+	/**
+	 * @return the group
+	 */
+	public UGroup getGroup() {
+		return group;
+	}
+
+	/**
+	 * @param group the group to set
+	 */
+	public void setGroup(UGroup group) {
+		this.group = group;
 	}
 
 //	/**
