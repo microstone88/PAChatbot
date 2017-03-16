@@ -90,7 +90,7 @@ abstract class Database {
 	
 	static class TInfo {
 		enum Column {
-			UID ("uid"), LOCALE ("locale"), FIRSTNAME ("first_name"), LASTNAME ("last_name"),
+			UID ("uid"), LOCALE ("locale"), CIVILITY ("civility"), FIRSTNAME ("first_name"), LASTNAME ("last_name"),
 			// Contact information
 			CELLPHONE ("cell"), EMAIL ("email"),
 			// Payment information

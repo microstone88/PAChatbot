@@ -6,6 +6,7 @@ package com.pachatbot.myproject.server;
 import java.util.Locale;
 
 import com.pachatbot.myproject.shared.PreDefinedEnum.UGroup;
+import com.pachatbot.myproject.shared.PreDefinedEnum.ULocale;
 import com.pachatbot.myproject.shared.PreDefinedEnum.UStatus;
 
 /**
@@ -32,7 +33,7 @@ abstract class SqlQueryUtils extends Database {
 	
 	static QueryResult queryForStdAnswer(Locale locale_lang, String std_question) {
 		sql = "SELECT `" + TAnswers.Column.STDANS + "` FROM `" + Tables.STDANS + "`"
-				+ " WHERE `" + TAnswers.Column.STDQUEST + "` = \"" + std_question.toLowerCase(locale_lang) + "\"";
+				+ " WHERE `" + TAnswers.Column.STDQUEST + "` = '" + std_question.toLowerCase(locale_lang) + "'";
 //						+ " AND `locale` = \"" + locale_lang + "\"";
 		return Database.executeQuery(sql);
 	}
@@ -40,8 +41,16 @@ abstract class SqlQueryUtils extends Database {
 	
 	static QueryResult queryForClientLoginByUsername(String username, String password) {
 		sql = "SELECT * FROM `" + Tables.CLOGIN + "`"
-				+ " WHERE `" + TLogin.Column.USERNAME + "` = \"" + username + "\""
+				+ " WHERE `" + TLogin.Column.USERNAME + "` = '" + username + "'"
 				+ " AND `" + TLogin.Column.PASSWD + "` = AES_ENCRYPT('" + password + "','" + Database.KEY_STR + "')";
+		return Database.executeQuery(DB.CLIENTS, sql);
+	}
+	
+	
+	static QueryResult queryForClientLoginByUsername(String username) {
+		sql = "SELECT `" + TLogin.Column.UID + "` "
+			+ "FROM `" + Tables.CLOGIN + "` "
+			+ "WHERE `" + TLogin.Column.USERNAME + "` = '" + username + "'";
 		return Database.executeQuery(DB.CLIENTS, sql);
 	}
 	
@@ -54,7 +63,7 @@ abstract class SqlQueryUtils extends Database {
 	}
 	
 	
-	static QueryResult queryForClientInfoByPrimaryID(long uid) {
+	static QueryResult queryForClientInfoByUID(long uid) {
 		sql = "SELECT " + TInfo.Column.UID + ","
 						+ TInfo.Column.LOCALE + "," 
 						+ TInfo.Column.FIRSTNAME + "," 
@@ -92,24 +101,30 @@ abstract class SqlQueryUtils extends Database {
 	}
 	
 	
-	static QueryResult insertNewClientLogin (String username, String passwd, Enum<UGroup> group) {
+	static QueryResult insertNewClientLogin (String username, String passwd, Enum<UGroup> group, String ip, Enum<UStatus> status) {
 		String dml = "INSERT INTO `" + Tables.CLOGIN + "` "
-				+ "(`" + TLogin.Column.USERNAME + "`, `" + TLogin.Column.PASSWD + "`, `" + TLogin.Column.GROUP + "`) "
+				+ "(`" + TLogin.Column.USERNAME + "`, `" + TLogin.Column.PASSWD + "`, `" + TLogin.Column.GROUP + "`,"
+				+ " `" + TLogin.Column.LASTACT + "`, `" + TLogin.Column.LASTIP + "`, `" + TLogin.Column.STATUS + "`) "
 				+ "VALUES "
-				+ "('" + username + "', AES_ENCRYPT('" + passwd + "','" + Database.KEY_STR + "'), '" + group + "');";
+				+ "('" + username + "', AES_ENCRYPT('" + passwd + "','" + Database.KEY_STR + "'), '" + group + "',"
+				+ " NOW(), '" + ip + "', '" + status + "');";
 		sql = "SELECT * FROM `" + Tables.CLOGIN + "` WHERE `" + TLogin.Column.UID + "` = LAST_INSERT_ID();";
 		return Database.executeUpdateAndGetPrimaryID(DB.CLIENTS, dml, sql);
 	}
 	
 	
 	static QueryResult insertNewClientInfo (long uid, String firstname, String lastname, 
-			String email, String cellphone, String locale) {
+			String email, String cellphone, Enum<ULocale> locale) {
+		
+		if (!email.equals("NULL")) email = "'" + email + "'";
+		if (!cellphone.equals("NULL")) cellphone = "'" + cellphone + "'";
+		
 		String dml = "INSERT INTO `" + Tables.CINFO + "` "
 				+ "(`" + TInfo.Column.UID + "`, `" + TInfo.Column.FIRSTNAME + "`, `" + TInfo.Column.LASTNAME + "`,"
 				+ " `" + TInfo.Column.EMAIL + "`, `" + TInfo.Column.CELLPHONE + "`, `" + TInfo.Column.LOCALE + "`) "
 				+ "VALUES "
 				+ "('" + uid + "', '" + firstname + "', '" + lastname + "',"
-				+ " '" + email + "', '" + cellphone + "', '" + locale + "');";
+				+ " " + email + ", " + cellphone + ", '" + locale + "');";
 		sql = "SELECT * FROM `" + Tables.CINFO + "` WHERE `" + TInfo.Column.UID + "` = LAST_INSERT_ID();";
 		return Database.executeUpdateAndGetPrimaryID(DB.CLIENTS, dml, sql);
 	}

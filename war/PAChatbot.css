@@ -5,6 +5,29 @@
   padding: 3px;
 }
 
+.popupConfirmBox {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.popupConfirmBoxText {
+	font-size: 1.2em;
+}
+
+.gwt-PopupPanelGlass {
+  background-color: #000;
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+
+.gwt-DialogBox .Caption {
+	font-size: 1.2em;
+/* 	color: white;
+	background: #62b0ff !important; */
+}
+
 .errorTextField {
 	color: red;
 	border-color: red !important;

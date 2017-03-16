@@ -39,11 +39,13 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.pachatbot.myproject.client.UI.PopupConfirmBox;
 import com.pachatbot.myproject.client.animation.FadeAnimation;
 import com.pachatbot.myproject.client.animation.ScrollAnimation;
 import com.pachatbot.myproject.shared.FieldVerifier;
@@ -85,6 +87,15 @@ public class PAChatbot implements EntryPoint {
 			"5-20 letters, numbers and _-", "8-30 letters, numbers and _-", 
 			"8-30 letters, numbers and _-",	"8-30 letters, numbers and _-"};
 	
+	private static final String[] EDIT_CHECK_TEXT = {" E-mail address", " Cellphone number",
+			" PayPal", " Alipay", " WeChat"};
+	
+	private static final String[] EDIT_DEFAULT_TEXT = {"email address", "cellphone number", 
+			"PayPal account", "Alipay account", "WeChat account"};
+	
+	private static final String[] EDIT_TITLE_TEXT = {"email address", "cellphone number", 
+			"PayPal account", "Alipay account", "WeChat account"};
+	
 	private static final int FADING_DURATION = 500;
 	private static final int MAX_FADING_DURATION = 2000;
 	private static final int SCROLLING_DURATION = 200;
@@ -100,7 +111,7 @@ public class PAChatbot implements EntryPoint {
 	private static final String SERVER_ERROR = "An error occurred while "
 			+ "attempting to contact the server. Please check your network " 
 			+ "connection and try again.";
-
+	
 	/**
 	 * Customized animation
 	 */
@@ -281,6 +292,10 @@ public class PAChatbot implements EntryPoint {
 		/**
 		 *  Options UI
 		 */
+		final VerticalPanel optionsHolder = new VerticalPanel();
+		optionsHolder.setSpacing(2);
+		optionsHolder.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		
 		final Button clearButton = new Button("Clear History");
 		final Button exportButton = new Button("Export History");
 		
@@ -289,10 +304,53 @@ public class PAChatbot implements EntryPoint {
 		optionsTable.setWidget(0, 0, clearButton);
 		optionsTable.setWidget(0, 1, exportButton);
 		
-		final FlexCellFormatter signOutTableFormatter = 
+		final FlexCellFormatter optionsTableFormatter = 
 				optionsTable.getFlexCellFormatter();
-		signOutTableFormatter.setHorizontalAlignment(0, 1, 
+		optionsTableFormatter.setHorizontalAlignment(0, 1, 
 				HasHorizontalAlignment.ALIGN_RIGHT);
+		
+		final HTML line1 = new HTML("<hr width = \"95%\" size=\"3\" color=\"#62b0ff\" noshade>");
+		optionsHolder.add(optionsTable);
+		optionsHolder.add(line1);
+		
+		final CheckBox[] editChecks = {};
+		final TextBox[] editFields = {};
+		final Button[] updateButtons = {};
+		
+		final HorizontalPanel[] updatePanels = {};
+		final FlexTable[] updateTabs = {};
+		
+		final HTML line2 = new HTML("<hr width = \"95%\" size=\"3\" color=\"#62b0ff\" noshade>");
+		
+		for (int i = 0; i < 5; i++) {
+			editChecks[i] = new CheckBox("Email");
+			editFields[i] = new TextBox();
+			updateButtons[i] = new Button("Update");
+			
+			updatePanels[i] = new HorizontalPanel();
+			updatePanels[i].setWidth("100%");
+			updatePanels[i].setSpacing(3);
+			updatePanels[i].setHorizontalAlignment(
+					HasHorizontalAlignment.ALIGN_CENTER);
+			updatePanels[i].setVerticalAlignment(
+					HasVerticalAlignment.ALIGN_MIDDLE);
+			updatePanels[i].add(editFields[i]);
+			updatePanels[i].add(updateButtons[i]);
+			updatePanels[i].setCellWidth(updateButtons[i], "5%");
+			
+			updateTabs[i] = new FlexTable();
+			updateTabs[i].setCellSpacing(2);
+			updateTabs[i].setWidget(0, 0, editChecks[i]);
+			updateTabs[i].setWidget(1, 0, updatePanels[i]);
+			
+			if (i == 2) optionsHolder.add(line2);
+			optionsHolder.add(updateTabs[i]);
+		}
+		
+//		optionsHolder.setCellHeight(line1, "22px");
+//		optionsHolder.setCellHeight(line2, "30px");
+		
+		initializeEditTabs(editChecks, editFields, updateButtons);
 		
 		/**
 		 *  My Account UI
@@ -324,27 +382,49 @@ public class PAChatbot implements EntryPoint {
 		myAccountTable.setWidget(4, 0, label3);
 		myAccountTable.setWidget(4, 1, lastIpAddrLabel);
 		myAccountTable.setWidget(5, 0, new HTML("<hr size=\"3\" color=\"#62b0ff\" noshade>"));
-		myAccountTable.setWidget(6, 0, ma_currentPwField);
-		myAccountTable.setWidget(7, 0, ma_newPwField);
-		myAccountTable.setWidget(8, 0, ma_showNewPwCheck);
-		myAccountTable.setWidget(9, 1, changePwButton);
 		
 		final FlexCellFormatter myAccountTableFormatter = 
 				myAccountTable.getFlexCellFormatter();
 		myAccountTableFormatter.setColSpan(1, 0, 2);
 		myAccountTableFormatter.setColSpan(5, 0, 2);
-		myAccountTableFormatter.setColSpan(6, 0, 2);
-		myAccountTableFormatter.setColSpan(7, 0, 2);
-		myAccountTableFormatter.setColSpan(8, 0, 2);
 		
 		myAccountTableFormatter.setHorizontalAlignment(0, 1, 
-				HasHorizontalAlignment.ALIGN_RIGHT);
-		myAccountTableFormatter.setHorizontalAlignment(9, 1, 
 				HasHorizontalAlignment.ALIGN_RIGHT);
 		
 		Label[] labels = {nameLabel, label1, userGroupLabel, 
 				label2, lastActiveLabel,
 				label3, lastIpAddrLabel};
+		
+		final FlexTable changePwTable = new FlexTable();
+		changePwTable.setCellSpacing(6);
+		
+		changePwTable.setWidget(0, 0, ma_currentPwField);
+		changePwTable.setWidget(1, 0, ma_newPwField);
+		changePwTable.setWidget(2, 0, ma_showNewPwCheck);
+		changePwTable.setWidget(3, 1, changePwButton);
+		
+		final FlexCellFormatter changePwTableFormatter = 
+				changePwTable.getFlexCellFormatter();
+		changePwTableFormatter.setColSpan(0, 0, 2);
+		changePwTableFormatter.setColSpan(1, 0, 2);
+		changePwTableFormatter.setColSpan(2, 0, 2);
+		
+		changePwTableFormatter.setHorizontalAlignment(3, 1, 
+				HasHorizontalAlignment.ALIGN_RIGHT);
+		
+		final VerticalPanel myAccountHolder = new VerticalPanel();
+		myAccountHolder.setSpacing(2);
+		myAccountHolder.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		myAccountHolder.add(myAccountTable);
+		myAccountHolder.add(changePwTable);
+		
+		/**
+		 * 
+		 */
+		final PopupConfirmBox confirmBox = new PopupConfirmBox(false, true);
+		confirmBox.setConfirmText("Your chat history will be cleared" 
+				+ " when you sign out. Are you sure?");
+		confirmBox.setText("Sign Out");
 		
 		/**
 		 * 
@@ -384,13 +464,13 @@ public class PAChatbot implements EntryPoint {
 			
 			optionsDiscPanel.setAnimationEnabled(true);
 			optionsDiscPanel.setOpen(false);
-			optionsDiscPanel.setContent(optionsTable);
+			optionsDiscPanel.setContent(optionsHolder);
 			optionsDiscPanel.ensureDebugId("optionsDiscPanel");
 			
 			myAccountDiscPanel.setAnimationEnabled(true);
 			myAccountDiscPanel.setOpen(false);
-			myAccountDiscPanel.setContent(myAccountTable);
-			myAccountDiscPanel.ensureDebugId("aboutMeDiscPanel");
+			myAccountDiscPanel.setContent(myAccountHolder);
+			myAccountDiscPanel.ensureDebugId("myAccountDiscPanel");
 			
 			/**
 			 *  <--- Styling on PC --->
@@ -406,6 +486,10 @@ public class PAChatbot implements EntryPoint {
 			for (Label label : labels) {
 				label.addStyleName("normalDisplayText");
 			}
+			
+			confirmBox.getLabel().addStyleName("popupConfirmBoxText");
+			confirmBox.getYesButton().addStyleName("normalButton");
+			confirmBox.getCancelButton().addStyleName("normalButton");
 			
 			/**
 			 * 	<--- Sizing on PC --->
@@ -424,7 +508,7 @@ public class PAChatbot implements EntryPoint {
 			newPwField.setWidth("220px");
 			ma_currentPwField.setWidth("220px");
 			ma_newPwField.setWidth("220px");
-
+			
 			signInDiscPanel.setWidth("100%");
 			registerDiscPanel.setWidth("100%");
 			optionsDiscPanel.setWidth("100%");
@@ -434,6 +518,13 @@ public class PAChatbot implements EntryPoint {
 			registerTable.setWidth("250px");
 			optionsTable.setWidth("250px");
 			myAccountTable.setWidth("250px");
+			changePwTable.setWidth("250px");
+			
+			for (int i = 0; i < 5; i++) {
+				updateTabs[i].setWidth("250px");
+			}
+			
+			confirmBox.setWidth("360px");
 			
 			/**
 			 *  Main panel layout on PC
@@ -499,11 +590,11 @@ public class PAChatbot implements EntryPoint {
 			registerScrollPanel.add(registerTable);
 			registerScrollPanel.ensureDebugId("registerScrollPanel");
 			
-			optionsScrollPanel.add(optionsTable);
+			optionsScrollPanel.add(optionsHolder);
 			optionsScrollPanel.ensureDebugId("optionsScrollPanel");
 			
-			myAccountScrollPanel.add(myAccountTable);
-			myAccountScrollPanel.ensureDebugId("aboutMeScrollPanel");
+			myAccountScrollPanel.add(myAccountHolder);
+			myAccountScrollPanel.ensureDebugId("myAccountScrollPanel");
 			
 			stackLayout.add(chatScrollPanel, new HTML("Dialogue"), 2.4);
 			stackLayout.showWidget(chatScrollPanel);
@@ -535,6 +626,10 @@ public class PAChatbot implements EntryPoint {
 			
 			stackLayout.getHeaderWidget(0).setStyleName("customStackPanelHeader");
 			
+			confirmBox.getLabel().addStyleName("mobileDisplayText");
+			confirmBox.getYesButton().addStyleName("mobileButton");
+			confirmBox.getCancelButton().addStyleName("mobileButton");
+			
 			/**
 			 *  <--- Sizing on mobile device --->
 			 */
@@ -561,8 +656,12 @@ public class PAChatbot implements EntryPoint {
 			registerTable.setWidth(width - 17 + "px");
 			optionsTable.setWidth(width - 17 + "px");
 			myAccountTable.setWidth(width - 17 + "px");
+			changePwTable.setWidth(width - 17 + "px");
 			
-
+			for (int i = 0; i < 5; i++) {
+				updateTabs[i].setWidth(width - 20 + "px");
+			}
+			
 			/**
 			 *  Main panel layout on mobile device
 			 */
@@ -601,6 +700,11 @@ public class PAChatbot implements EntryPoint {
 					registerTable.setWidth(width - 17 + "px");
 					optionsTable.setWidth(width - 17 + "px");
 					myAccountTable.setWidth(width - 17 + "px");
+					changePwTable.setWidth(width - 17 + "px");
+					
+					for (int i = 0; i < 5; i++) {
+						updateTabs[i].setWidth(width - 20 + "px");
+					}
 				}
 			});
 			
@@ -721,10 +825,20 @@ public class PAChatbot implements EntryPoint {
 					public void onSuccess(Account result) {
 						
 						// Verify the result
-						if (result.getUid() == 0) {
-							displayReceivedMsgBubble("Ummm... maybe try again? Or register now!", FADING_DELAY);
-							return;
-						} 
+						switch ((int)result.getUid()) {
+						case 0:
+							displayReceivedMsgBubble("Ummm... maybe try again? Something wrong. Sorry about that.", FADING_DELAY); return;
+						case -1:
+							displayReceivedMsgBubble("Your username is not registered. Try again? or register now!", FADING_DELAY); return;
+						case -2:
+							displayReceivedMsgBubble("Sorry, your email address is not registered.", FADING_DELAY); return;
+						case -3:
+							displayReceivedMsgBubble("Sorry, your cellphone number is not registered.", FADING_DELAY); return;
+						case -4:
+							displayReceivedMsgBubble("Wrong combination! Try again?", FADING_DELAY); return;
+						default:
+							break;
+						}
 						
 						// Clear bubbles
 //						bubbleLayout.clear();
@@ -809,11 +923,19 @@ public class PAChatbot implements EntryPoint {
 				String email_address = emailField.getText().trim();
 				String cell_number = cellphoneField.getText().trim();
 				
-				// if optional fields are "default", set their values as empty string
+				// if optional fields are "default", set their values as NULL
 				if (emailField.getStyleName().toLowerCase().contains("default"))
-					email_address = "";
+					email_address = "NULL";
+				else if (!FieldVerifier.Email.isValid(email_address)) {
+					displayReceivedMsgBubble("Invalid email address!", FADING_DELAY);
+					return;
+				}
 				if (cellphoneField.getStyleName().toLowerCase().contains("default"))
-					cell_number = "";
+					cell_number = "NULL";
+				else if (!FieldVerifier.Cellphone.isValid(cell_number)) {
+					displayReceivedMsgBubble("Invalid cellphone number!", FADING_DELAY);
+					return;
+				}
 				
 				// register new user in database
 				SessionControl.Utils.getInstance().register(first_name, last_name, 
@@ -823,10 +945,19 @@ public class PAChatbot implements EntryPoint {
 					
 					@Override
 					public void onSuccess(Account result) {
+						
 						// Verify the result
-						if (result.getUid() == 0) {
-							displayReceivedMsgBubble("Ummm... maybe try again?", FADING_DELAY);
-							return;
+						switch ((int)result.getUid()) {
+						case 0:
+							displayReceivedMsgBubble("Ummm... maybe try again? Something wrong. Sorry about that.", FADING_DELAY); return;
+						case -1:
+							displayReceivedMsgBubble("This username already exists. Try another one?", FADING_DELAY); return;
+						case -2:
+							displayReceivedMsgBubble("This email address is already registered.", FADING_DELAY); return;
+						case -3:
+							displayReceivedMsgBubble("This cellphone number is already registered.", FADING_DELAY); return;
+						default:
+							break;
 						}
 						
 						// Clear bubbles
@@ -929,6 +1060,48 @@ public class PAChatbot implements EntryPoint {
 		changePwButton.addClickHandler(changePwHandler);
 		ma_newPwField.addKeyUpHandler(changePwHandler);
 		
+		
+		confirmBox.addCloseHandler(new CloseHandler<PopupPanel>() {
+			
+			@Override
+			public void onClose(CloseEvent<PopupPanel> event) {
+				
+				if (event.isAutoClosed()) {
+					
+					SessionControl.Utils.getInstance().logout(
+							Integer.valueOf(Cookies.getCookie(COOKIE_NAME)), 
+							new AsyncCallback<Void>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
+						}
+
+						@Override
+						public void onSuccess(Void result) {
+							
+							// Clear bubbles
+							bubbleLayout.clear();
+							
+							// Display sign out success message
+							displayReceivedMsgBubble("See you later, then!", FADING_DELAY);
+							
+							// Load view after successfully logged out
+							loadLogoutSuccessfulView();
+							
+							// Reset panels
+							resetOptionsPanel();
+							resetMyAccountPanel(true, ma_showNewPwCheck, 
+									ma_currentPwField, ma_newPwField);
+							
+							// remove Cookie when sign out
+							Cookies.removeCookie(COOKIE_NAME, "/");
+						}
+					});
+				}
+			}
+		});
+		
 		/**
 		 * Handling button click events
 		 */
@@ -944,36 +1117,8 @@ public class PAChatbot implements EntryPoint {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				SessionControl.Utils.getInstance().logout(
-						Integer.valueOf(Cookies.getCookie(COOKIE_NAME)), 
-						new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						
-						// Clear bubbles
-//						bubbleLayout.clear();
-						
-						// Display sign out success message
-						displayReceivedMsgBubble("See you later, then!");
-						
-						// Load view after successfully logged out
-						loadLogoutSuccessfulView();
-						
-						// Reset panels
-						resetOptionsPanel();
-						resetMyAccountPanel(true, ma_showNewPwCheck, 
-								ma_currentPwField, ma_newPwField);
-						
-						// remove Cookie when sign out
-						Cookies.removeCookie(COOKIE_NAME, "/");
-					}
-				});
+				confirmBox.center();
+				confirmBox.show();
 			}
 		});
 		
@@ -1044,7 +1189,6 @@ public class PAChatbot implements EntryPoint {
 		
 	}
 	
-	
 	private void toggleShowPassword(PasswordTextBox passwdField) {
 		String currentType = passwdField.getElement().getAttribute("type");
 		if (currentType.contains("password"))
@@ -1053,7 +1197,6 @@ public class PAChatbot implements EntryPoint {
 			passwdField.getElement().setAttribute("type", "password");
 	}
 	
-
 	private void resetSignInPanel(CheckBox showPwCheck, TextBox... fields) {
 		showPwCheck.setValue(true);
 		for (int i = 0; i < fields.length; i++) {
@@ -1103,7 +1246,6 @@ public class PAChatbot implements EntryPoint {
 		optionsDiscPanel.setOpen(false);
 	}
 	
-	
 	private void loadLoginSuccessfulView(Account account) {
 
 		String fstName = StringUtils.CapitalizeFstLetter(account.getFirstname());
@@ -1120,10 +1262,8 @@ public class PAChatbot implements EntryPoint {
 		
 		// Update the UI
 		if (!IS_MOBILE) {
-			// Display the user's first name in the panel's header
-//			aboutMeDiscPanel.getHeaderTextAccessor().setText(fstName);
-			
 			westLayout.clear();
+			
 			westLayout.add(myAccountDiscPanel);
 			westLayout.add(optionsDiscPanel);
 			
@@ -1138,7 +1278,6 @@ public class PAChatbot implements EntryPoint {
 		}
 
 	}
-	
 	
 	private void loadLogoutSuccessfulView() {
 		
@@ -1164,7 +1303,6 @@ public class PAChatbot implements EntryPoint {
 		}
 	}
 	
-	
 	private void displaySentMsgBubble(String msg) {
 		final Label sentMsgLable = new Label(msg);
 		if (!IS_MOBILE) sentMsgLable.setStyleName("normalSentMessageText");
@@ -1188,7 +1326,6 @@ public class PAChatbot implements EntryPoint {
 		fadeAnimator.setElement(sentBubble);
 		fadeAnimator.fade(FADING_DURATION, 1.0);
 	}
-	
 	
 	private DecoratorPanel displayReceivedMsgBubble(String msg) {
 		
@@ -1216,7 +1353,6 @@ public class PAChatbot implements EntryPoint {
 		return receivedBubble;
 	}
 	
-	
 	private void displayReceivedMsgBubble(String msg, int delay) {
 		final DecoratorPanel receivedBubble = displayReceivedMsgBubble(msg);
 		final FadeAnimation animator = new FadeAnimation(receivedBubble);
@@ -1229,11 +1365,98 @@ public class PAChatbot implements EntryPoint {
 					public void run() {bubbleLayout.remove(receivedBubble);}
 				};
 				remover.schedule(MAX_FADING_DURATION);
+//				int h = receivedBubble.getOffsetHeight();
+//				int w = receivedBubble.getOffsetWidth();
+//				errorLabel.setText("Cell height = " + h + " Cell width = " + w);
 			}
 		};
 		timer.schedule(delay);
 	}
 	
+	private void initializeEditTabs(CheckBox[] editChecks, TextBox[] editFields, Button[] updateButtons) {
+
+		for (int i = 0; i < editFields.length; i++) {
+			final int index = i;
+			final CheckBox editCheck = editChecks[i];
+			final TextBox editField = editFields[i];
+			final Button updateButton = updateButtons[i];
+			
+			if (IS_MOBILE) {
+				editCheck.addStyleName("mobileDisplayText");
+				editField.addStyleName("mobileTextFieldText");
+				editField.addStyleName("mobileDefaultTextFieldText");
+				updateButton.addStyleName("mobileButton");
+				editField.setWidth("95%");
+			} else {
+				editCheck.addStyleName("normalDisplayText");
+				editField.addStyleName("normalDefaultTextFieldText");
+				editField.setWidth("93%");
+			}
+			editCheck.setText(EDIT_CHECK_TEXT[i]);
+			editField.setText(EDIT_DEFAULT_TEXT[i]);
+			editField.setTitle(EDIT_TITLE_TEXT[i]);
+			editField.setEnabled(false);
+			updateButton.setEnabled(false);
+			editCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+				@Override
+				public void onValueChange(ValueChangeEvent<Boolean> event) {
+					editField.setEnabled(!editField.isEnabled());
+					updateButton.setEnabled(!updateButton.isEnabled());
+				}
+			});
+			
+			editField.addFocusHandler(new FocusHandler() {
+				
+				@Override
+				public void onFocus(FocusEvent event) {
+					if (editField.getStyleName().toLowerCase().contains("default")) 
+						editField.setText("");
+					if (IS_MOBILE) editField.removeStyleName("mobileDefaultTextFieldText");
+					else editField.removeStyleName("normalDefaultTextFieldText");
+				}
+			});
+			
+			editField.addBlurHandler(new BlurHandler() {
+				@Override
+				public void onBlur(BlurEvent event) {
+					String currentText = editField.getText();
+					
+					// if empty, reset the default text
+					if (currentText.trim().length() < 1) {
+						if (IS_MOBILE) editField.addStyleName("mobileDefaultTextFieldText");
+						else editField.addStyleName("normalDefaultTextFieldText");
+						editField.setText(EDIT_DEFAULT_TEXT[index]);
+						editField.removeStyleName("errorTextField");
+					}
+					// if not empty, validate the content
+					else {
+						switch (index) {
+						case 0: //email address
+							if (!FieldVerifier.Email.isValid(currentText)) {
+								editField.addStyleName("errorTextField");
+								displayReceivedMsgBubble("This is not a valid email address.", FADING_DELAY);
+							} 
+							else if (editField.getStyleName().toLowerCase().contains("error")) editField.removeStyleName("errorTextField");
+							break;
+						
+						case 1: //cellphone number
+							if (!FieldVerifier.Cellphone.isValid(currentText)) {
+								editField.addStyleName("errorTextField");
+								displayReceivedMsgBubble("This is not a valid cellphone number.", FADING_DELAY);
+							} 
+							else if (editField.getStyleName().toLowerCase().contains("error")) editField.removeStyleName("errorTextField");
+							break;
+
+						default:
+							break;
+						}
+					}
+					
+				}
+			});
+		}
+		
+	}
 	
 	private void initializeTextFields(final TextBox[] fields) {
 		for (int i = 0; i < fields.length; i++) {
@@ -1255,7 +1478,6 @@ public class PAChatbot implements EntryPoint {
 						textbox.setText("");
 					if (IS_MOBILE) textbox.removeStyleName("mobileDefaultTextFieldText");
 					else textbox.removeStyleName("normalDefaultTextFieldText");
-//					textbox.selectAll();
 				}
 			});
 			
@@ -1336,11 +1558,11 @@ public class PAChatbot implements EntryPoint {
 							} 
 							else if (currentText.length() > 20) {
 								textbox.addStyleName("errorTextField");
-								displayReceivedMsgBubble("Your username must have at most 20 characters.", FADING_DELAY);
+								displayReceivedMsgBubble("Your username must have no more than 20 characters.", FADING_DELAY);
 							}
 							else if (!FieldVerifier.Username.isValid(currentText)) {
 								textbox.addStyleName("errorTextField");
-								displayReceivedMsgBubble("Your username should contain only letters, numbers, \"_\" and \"-\".", FADING_DELAY);
+								displayReceivedMsgBubble("Your username should contain only letters (at least one), numbers, \"_\" and \"-\".", FADING_DELAY);
 							} 
 							else if (textbox.getStyleName().toLowerCase().contains("error")) textbox.removeStyleName("errorTextField");
 							break;
@@ -1353,7 +1575,7 @@ public class PAChatbot implements EntryPoint {
 							}
 							else if (currentText.length() > 30) {
 								textbox.addStyleName("errorTextField");
-								displayReceivedMsgBubble("Your password must have at most 30 characters.", FADING_DELAY);
+								displayReceivedMsgBubble("Your password must have no more than 30 characters.", FADING_DELAY);
 							}
 							else if (!FieldVerifier.Password.isValid(currentText)) {
 								textbox.addStyleName("errorTextField");
@@ -1384,10 +1606,9 @@ public class PAChatbot implements EntryPoint {
 		}
 	}
 	
-	
 	private void checkWithServerIfSessionIsStillLegal(final long uid) {
 		
-		SessionControl.Utils.getInstance().loginFromSessionServer(
+		SessionControl.Utils.getInstance().loginFromSessionServer(uid,
 				new AsyncCallback<Account>() {
 			
 			@Override

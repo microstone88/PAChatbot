@@ -10,6 +10,7 @@ import com.pachatbot.myproject.client.SessionControl;
 import com.pachatbot.myproject.server.Database.TInfo;
 import com.pachatbot.myproject.server.Database.TLogin;
 import com.pachatbot.myproject.shared.PreDefinedEnum.ULocale;
+import com.pachatbot.myproject.shared.FieldVerifier;
 import com.pachatbot.myproject.shared.PreDefinedEnum.UGroup;
 import com.pachatbot.myproject.shared.PreDefinedEnum.UStatus;
 import com.pachatbot.myproject.shared.Bean.Account;
@@ -34,42 +35,40 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 		QueryResult qrInfo = new QueryResult();
 		QueryResult qrLogin = new QueryResult();
 		
-		if (identifier.contains("@")) {
-			
+		if (FieldVerifier.Email.isValid(identifier)) {
 			// Try "identifier" as email address
 			qrInfo = SqlQueryUtils.queryForClientInfoByEmail(identifier);
 			if (qrInfo.isUniqueRow()) {
 				uid = (long) qrInfo.getValue(1, TInfo.Column.UID);
 				// Verify password
 				qrLogin = SqlQueryUtils.queryForClientLoginByUID(uid, password);
-			}
-			// email not unique or doesn't exist (login not successful!)
-			else return re;
+			} else {re.setUid(-2); return re;} // email doesn't exist (login not successful!)
+		}
 		
-		} else {
-			
+		if (FieldVerifier.Cellphone.isValid(identifier)) {
 			// Try "identifier" as cellphone number
 			qrInfo = SqlQueryUtils.queryForClientInfoByCellphone(identifier);
 			if (qrInfo.isUniqueRow()) {
 				uid = (long) qrInfo.getValue(1, TInfo.Column.UID);
 				// Verify password
 				qrLogin = SqlQueryUtils.queryForClientLoginByUID(uid, password);
-			}
-			
-			// cellphone number not unique or doesn't exist
-			else { 
-				// Try "identifier" as username and verify password
-				qrLogin = SqlQueryUtils.queryForClientLoginByUsername(identifier, password);
-			}
+			} else {re.setUid(-3); return re;} // cellphone number doesn't exist (login not successful!)
 		}
 		
-		if (!qrLogin.isUniqueRow()) return re; // wrong cellphone or combination (not successful!)
-		// If password is verified
+		if (FieldVerifier.Username.isValid(identifier)) { 
+			// Try "identifier" as username
+			if (SqlQueryUtils.queryForClientLoginByUsername(identifier).isEmpty()) {
+				re.setUid(-1); return re; // username doesn't exist (login not successful!)
+			}
+			// Verify password
+			qrLogin = SqlQueryUtils.queryForClientLoginByUsername(identifier, password);
+		}
+		
+		if (!qrLogin.isUniqueRow()) {re.setUid(-4); return re;}// wrong combination (login not successful!)
 		else {
 			uid = (long) qrLogin.getValue(1, TLogin.Column.UID);
-			// If the provided "identifier" is username
 			if (!qrInfo.isUniqueRow()) 
-				qrInfo = SqlQueryUtils.queryForClientInfoByPrimaryID(uid); // uid is always unique
+				qrInfo = SqlQueryUtils.queryForClientInfoByUID(uid); // uid is always unique
 			// Combine the query results from the two tables (both have unique row)
 			re = combine(qrLogin, qrInfo);
 			// Store the account/session identification
@@ -82,17 +81,35 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 	}
 	
 	@Override
-	public Account register(String firstname, String lastname, String email, String cellphone, String username,
-			String password) {
+	public Account register(String firstname, String lastname, 
+			String email, String cellphone, 
+			String username, String password) {
 		
 		Account re = new Account();
-		QueryResult qrLogin = SqlQueryUtils.insertNewClientLogin(username, password, UGroup.user);
+		
+		if (!SqlQueryUtils.queryForClientLoginByUsername(username).isEmpty()) {
+			re.setUid(-1); return re; // username already exists!
+		}
+		
+		if (!email.equals("NULL")) {
+			if (!SqlQueryUtils.queryForClientInfoByEmail(email).isEmpty())
+				{re.setUid(-2); return re;} // email address already registered!
+		}
+		if (!cellphone.equals("NULL")) {
+			if (!SqlQueryUtils.queryForClientInfoByCellphone(cellphone).isEmpty())
+				{re.setUid(-3); return re;} // cellphone number already registered!
+		}
+		
+		String ip_address = this.getThreadLocalRequest().getRemoteAddr();
+		QueryResult qrLogin = SqlQueryUtils.insertNewClientLogin(
+				username, password, UGroup.user, ip_address, UStatus.active);
 		
 		if (qrLogin.isUniqueRow()) {
 			long uid = (long) qrLogin.getValue(1, TLogin.Column.UID);
-			QueryResult qrInfo = SqlQueryUtils.insertNewClientInfo(uid, firstname, lastname, email, cellphone, "fr_FR");
+			QueryResult qrInfo = SqlQueryUtils.insertNewClientInfo(
+					uid, firstname, lastname, email, cellphone, ULocale.fr_FR);
+			// Combine the query results from the two tables (both have unique row)
 			re = combine(qrLogin, qrInfo);
-			
 			// store the account/session identification
 			storeUserInSession(re);
 		}
@@ -136,8 +153,11 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 	}
 
 	@Override
-	public Account loginFromSessionServer() {
-		return fetchUserFromSession();
+	public Account loginFromSessionServer(long uid) {
+		Account re = fetchUserFromSession();
+		if (re.getUid() == 0) 
+			SqlQueryUtils.updateOnlyUserStatus(uid, UStatus.expired);
+		return re;
 	}
 	
 	@Override

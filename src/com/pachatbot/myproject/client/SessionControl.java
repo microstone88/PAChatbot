@@ -19,7 +19,7 @@ public interface SessionControl extends RemoteService {
 	
 	boolean changePassword(long uid, String oldPasswd, String newPasswd);
 	
-    Account loginFromSessionServer();
+    Account loginFromSessionServer(long uid);
     
     Account register(String firstname, String lastname, String email, String cellphone,
     		String username, String password);

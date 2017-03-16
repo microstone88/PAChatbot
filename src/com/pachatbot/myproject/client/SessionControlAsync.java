@@ -18,7 +18,7 @@ public interface SessionControlAsync {
 	
 	void changePassword(long uid, String oldPasswd, String newPasswd, AsyncCallback<Boolean> callback);
 	
-	void loginFromSessionServer(AsyncCallback<Account> callback);
+	void loginFromSessionServer(long uid, AsyncCallback<Account> callback);
 	
 	void register(String firstname, String lastname, String email, String cellphone,
     		String username, String password, AsyncCallback<Account> callback);

@@ -20,7 +20,9 @@ public class FieldVerifier {
 	public static class Username extends FieldVerifier {
 		public Username(){}
 		public static boolean isValid(String username) {
-			return username.matches("^[a-zA-Z0-9_-]{5,20}$");
+//			return username.matches("^[a-zA-Z0-9_-]{5,20}$");
+//			return username.matches("^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+){5,20}$");
+			return username.matches("^(?=.*[a-zA-Z])[a-zA-Z0-9_-]{5,20}$");
 		}
 	}
 	
@@ -52,7 +54,7 @@ public class FieldVerifier {
 			 * \\p{L} is a Unicode Character Property that 
 			 * matches any kind of letter from any language.
 			 */
-			return firstname.matches("^[a-zA-Z\u00C0-\u017F ’.'-]+$"); 
+			return firstname.matches("^[a-zA-Z\u00C0-\u017F ’.'-]{1,30}$"); 
 		}
 	}
 	
@@ -63,7 +65,7 @@ public class FieldVerifier {
 			 * \\p{L} is a Unicode Character Property that 
 			 * matches any kind of letter from any language.
 			 */
-			return lastname.matches("^[a-zA-Z\u00C0-\u017F ’.'-]+$"); 
+			return lastname.matches("^[a-zA-Z\u00C0-\u017F ’.'-]{1,60}$"); 
 		}
 	}
 
