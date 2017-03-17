@@ -1,8 +1,5 @@
 package com.pachatbot.myproject.server;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-
 public class Test {
 
 	public static void main(String[] args) {
@@ -28,12 +25,20 @@ public class Test {
 		
 //		System.out.println(Locale.FRANCE.toString());
 		
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//		
+//		System.out.println(timestamp);
+//		System.out.println(formatter.format(timestamp));
 		
-		System.out.println(timestamp);
-		System.out.println(formatter.format(timestamp));
-		
+		String payPal = "abcdefghijklmn";
+		int tier = payPal.length()/3; int mid = payPal.length() - 2 * tier;
+		String cached = payPal.substring(0, tier);
+		for (int i = 0; i < mid; i++) {
+			cached += "*";
+		}
+		cached += payPal.substring(tier + mid);
+		System.out.println(cached);
 
 //		QueryResult qrInfo = SqlQueryUtils.queryForClientInfoByPrimaryID(1);
 //		System.out.println(qrInfo);

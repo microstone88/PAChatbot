@@ -16,16 +16,18 @@
 	font-size: 1.2em;
 }
 
+.normalPopupConfirmBoxText .Caption {
+	font-size: 1.2em;
+}
+
+.mobilePopupConfirmBoxText .Caption {
+	font-size: 1.4em;
+}
+
 .gwt-PopupPanelGlass {
   background-color: #000;
   opacity: 0.3;
   filter: alpha(opacity=30);
-}
-
-.gwt-DialogBox .Caption {
-	font-size: 1.2em;
-/* 	color: white;
-	background: #62b0ff !important; */
 }
 
 .errorTextField {

@@ -68,6 +68,27 @@ public class FieldVerifier {
 			return lastname.matches("^[a-zA-Z\u00C0-\u017F ’.'-]{1,60}$"); 
 		}
 	}
+	
+	public static class PayPalAcc extends FieldVerifier {
+		public PayPalAcc(){}
+		public static boolean isValid(String payPalAcc) {
+			return payPalAcc.matches("^[a-zA-Z0-9._@-]{3,}$");
+		}
+	}
+
+	public static class AlipayAcc extends FieldVerifier {
+		public AlipayAcc(){}
+		public static boolean isValid(String payPalAcc) {
+			return payPalAcc.matches("^[a-zA-Z0-9._@-]{3,}$");
+		}
+	}
+	
+	public static class WeChatAcc extends FieldVerifier {
+		public WeChatAcc(){}
+		public static boolean isValid(String payPalAcc) {
+			return payPalAcc.matches("^[a-zA-Z0-9._@-]{3,}$");
+		}
+	}
 
 	
 	

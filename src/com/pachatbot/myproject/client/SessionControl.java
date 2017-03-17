@@ -3,7 +3,8 @@ package com.pachatbot.myproject.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.pachatbot.myproject.shared.PreDefinedEnum.UStatus;
+import com.pachatbot.myproject.shared.PreDefined.TInfo;
+import com.pachatbot.myproject.shared.PreDefined.UStatus;
 import com.pachatbot.myproject.shared.Bean.Account;
 
 /**
@@ -23,6 +24,8 @@ public interface SessionControl extends RemoteService {
     
     Account register(String firstname, String lastname, String email, String cellphone,
     		String username, String password);
+    
+    Account update(long uid, TInfo.Column ref, String newStr);
     
     UStatus checkUserStatus(Account account);
     

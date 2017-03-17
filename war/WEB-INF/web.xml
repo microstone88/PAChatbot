@@ -18,7 +18,7 @@
   
   <servlet>
     <servlet-name>messageServlet</servlet-name>
-    <servlet-class>com.pachatbot.myproject.server.MessageServiceImpl</servlet-class>
+    <servlet-class>com.pachatbot.myproject.server.Impl.MessageServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -28,7 +28,7 @@
   
     <servlet>
     <servlet-name>sessionServlet</servlet-name>
-    <servlet-class>com.pachatbot.myproject.server.SessionControlImpl</servlet-class>
+    <servlet-class>com.pachatbot.myproject.server.Impl.SessionControlImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
