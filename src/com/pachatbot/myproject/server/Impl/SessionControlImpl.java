@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.pachatbot.myproject.client.SessionControl;
+import com.pachatbot.myproject.server.AccUtils;
 import com.pachatbot.myproject.server.QueryResult;
 import com.pachatbot.myproject.server.Impl.Database.TLogin;
 import com.pachatbot.myproject.shared.FieldVerifier;
@@ -128,17 +129,21 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 			re.setStatus(UStatus.valueOf((String) qrLogin.getValue(1, TLogin.Column.STATUS)));
 			re.setGroup(UGroup.valueOf((String) qrLogin.getValue(1, TLogin.Column.GROUP)));
 			
-			re.setFirstname((String) qrInfo.getValue(1, TInfo.Column.FIRSTNAME));
-			re.setLastname((String) qrInfo.getValue(1, TInfo.Column.LASTNAME));
-			re.setEmail((String) qrInfo.getValue(1, TInfo.Column.EMAIL));
-			re.setCellphone((String) qrInfo.getValue(1, TInfo.Column.CELLPHONE));
-			re.setLocale(ULocale.valueOf((String) qrInfo.getValue(1, TInfo.Column.LOCALE)));
+			AccUtils.updateAccountInfoFrom(qrInfo, re);
+			
+//			re.setFirstname((String) qrInfo.getValue(1, TInfo.Column.FIRSTNAME));
+//			re.setLastname((String) qrInfo.getValue(1, TInfo.Column.LASTNAME));
+//			re.setEmail((String) qrInfo.getValue(1, TInfo.Column.EMAIL));
+//			re.setCellphone((String) qrInfo.getValue(1, TInfo.Column.CELLPHONE));
+//			re.setLocale(ULocale.valueOf((String) qrInfo.getValue(1, TInfo.Column.LOCALE)));
 			
 			// Add payment information
-			QueryResult qr = SqlQueryUtils.queryForClientPaymentInfo(uid_l);
-			re.setPayPal((String) qr.getValue(1, TInfo.Column.PayPal));
-			re.setAlipay((String) qr.getValue(1, TInfo.Column.Alipay));
-			re.setWeChat((String) qr.getValue(1, TInfo.Column.WeChat));
+			QueryResult qr = SqlQueryUtils.queryForClientPaymentInfoByUID(uid_l);
+			AccUtils.updateAccountInfoFrom(qr, re);
+			
+//			re.setPayPal((String) qr.getValue(1, TInfo.Column.PayPal));
+//			re.setAlipay((String) qr.getValue(1, TInfo.Column.Alipay));
+//			re.setWeChat((String) qr.getValue(1, TInfo.Column.WeChat));
 			
 		}
 		else throw new IllegalArgumentException("uid dosen't match! login uid = " + uid_l + ", info uid = " + uid_i);
@@ -165,6 +170,13 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 		Account re = fetchUserFromSession();
 		if (re.getUid() == 0) 
 			SqlQueryUtils.updateOnlyUserStatus(uid, UStatus.expired);
+		else if (re.getUid() == uid) {
+			QueryResult qrCont = SqlQueryUtils.queryForClientInfoByUID(re.getUid());
+			int count_c = AccUtils.updateAccountInfoFrom(qrCont, re);
+			QueryResult qrPaym = SqlQueryUtils.queryForClientPaymentInfoByUID(re.getUid());
+			int count_p = AccUtils.updateAccountInfoFrom(qrPaym, re);
+			re.setNumOfIncoherents(count_c + count_p);
+		}
 		return re;
 	}
 	
@@ -173,11 +185,24 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 		Account re = fetchUserFromSession();
 		if (re.getUid() == uid) {
 			
-			//TODO prevent duplicated email or cellphone
+			switch (ref) {
+			case EMAIL:
+				QueryResult qrEmail = SqlQueryUtils.queryForClientInfoByEmail(newStr);
+				if (!qrEmail.isEmpty()) { re.setUid(-1); return re; }
+				break;
+			case CELLPHONE:
+				QueryResult qrCell = SqlQueryUtils.queryForClientInfoByCellphone(newStr);
+				if (!qrCell.isEmpty()) { re.setUid(-1); return re; }
+				break;
+			default:
+				break;
+			}
 			
 			QueryResult qr = SqlQueryUtils.updateClientInfo(uid, ref, newStr);
-			if (qr.isUniqueValue()) re.set(ref, qr.getUniqueValue().toString());
-			
+			if (qr.isUniqueValue()) {
+				if (qr.getUniqueValue() != null) re.set(ref, qr.getUniqueValue().toString());
+				else re.set(ref, null);
+			}
 			
 			// update the account/session identification
 			// (!!! Not necessary! user stored in session is automatically synchronized !!!)

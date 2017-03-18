@@ -238,6 +238,13 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 	}
 
 	/**
+	 * @return the columnNames
+	 */
+	public ArrayList<String> getColumnNames() {
+		return columnNames;
+	}
+
+	/**
 	 * @return the sql
 	 */
 	public String getSql() {

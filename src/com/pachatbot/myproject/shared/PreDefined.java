@@ -4,17 +4,6 @@ import java.io.Serializable;
 
 public abstract class PreDefined {
 
-	/**
-	 * Due to some already known version issues, java.util.Locale object 
-	 * cannot be successfully serialized. Therefore, we use instead this 
-	 * customized serializable enum class.
-	 * @author micro
-	 *
-	 */
-	public enum ULocale implements Serializable {
-		fr_FR, zh_CN, en_US, en_GB;
-	}
-	
 	public enum UStatus implements Serializable {
 		active, offline, expired;
 		
@@ -25,9 +14,34 @@ public abstract class PreDefined {
 		
 	}
 	
-	public enum UCivility implements Serializable {
-		M, Mme, Mlle, Mr, Mrs, Ms, Dr; 
+	/**
+	 * Due to some already known version issues, java.util.Locale object 
+	 * cannot be successfully serialized. Therefore, we use instead this 
+	 * customized serializable enum class.
+	 * @author micro
+	 *
+	 */
+	public enum ULocale implements Serializable {
+		Unknown (""), 
+		en_US ("English(US)"), en_GB ("English(UK)"), fr_FR ("French"), zh_CN ("Chinese");
+		
+		private String locale = "";
+		ULocale(String locale){this.locale = locale;}
+		@Override
+		public String toString(){return locale;}
 	}
+	
+	public enum UCivility implements Serializable {
+		Unknown (""), Dr ("Dr."),
+		M ("M."), Mme ("Mme."), Mlle ("Mlle."), 
+		Mr ("Mr."), Mrs ("Mrs."), Ms ("Ms."), Miss ("Miss"); 
+		
+		private String civility = "";
+		UCivility(String civility){this.civility = civility;}
+		@Override
+		public String toString(){return civility;}
+	}
+	
 	
 	public abstract static class TInfo {
 		public enum Column {

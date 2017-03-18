@@ -77,9 +77,11 @@ public abstract class Database {
 		}
 	}
 	
-	
 	abstract static class TLogin {
 		enum Column {
+			
+			UNDEFINED ("undefined"),
+			
 			UID ("uid"), USERNAME ("usr_name"), PASSWD ("passwd"), GROUP ("usergroup"), 
 			CREAT ("created_at"), LASTACT ("last_active"), LASTIP ("last_ip"), STATUS ("status");
 			
@@ -89,6 +91,7 @@ public abstract class Database {
 			public String toString(){return colname;}
 		}
 	}
+	
 	
 	abstract static class TCountry {
 		enum Column {

@@ -66,6 +66,7 @@ abstract class SqlQueryUtils extends Database {
 	static QueryResult queryForClientInfoByUID(long uid) {
 		String sql = "SELECT " + TInfo.Column.UID + ","
 						+ TInfo.Column.LOCALE + "," 
+						+ TInfo.Column.CIVILITY + ","
 						+ TInfo.Column.FIRSTNAME + "," 
 						+ TInfo.Column.LASTNAME + ","
 						+ TInfo.Column.CELLPHONE + "," 
@@ -78,6 +79,7 @@ abstract class SqlQueryUtils extends Database {
 	static QueryResult queryForClientInfoByEmail(String email) {
 		String sql = "SELECT " + TInfo.Column.UID + ","
 						+ TInfo.Column.LOCALE + "," 
+						+ TInfo.Column.CIVILITY + ","
 						+ TInfo.Column.FIRSTNAME + "," 
 						+ TInfo.Column.LASTNAME + ","
 						+ TInfo.Column.CELLPHONE + ","
@@ -91,6 +93,7 @@ abstract class SqlQueryUtils extends Database {
 	static QueryResult queryForClientInfoByCellphone(String cellphone) {
 		String sql = "SELECT " + TInfo.Column.UID + ","
 						+ TInfo.Column.LOCALE + "," 
+						+ TInfo.Column.CIVILITY + ","
 						+ TInfo.Column.FIRSTNAME + "," 
 						+ TInfo.Column.LASTNAME + ","
 						+ TInfo.Column.CELLPHONE + ","
@@ -101,7 +104,7 @@ abstract class SqlQueryUtils extends Database {
 	}
 	
 	
-	static QueryResult queryForClientPaymentInfo(long uid) {
+	static QueryResult queryForClientPaymentInfoByUID(long uid) {
 		String sql = "SELECT " + TInfo.Column.UID + ","
 						+ TInfo.Column.PayPal + "," 
 						+ TInfo.Column.Alipay + "," 
@@ -112,19 +115,28 @@ abstract class SqlQueryUtils extends Database {
 	}
 	
 	
-	static QueryResult insertNewClientLogin(String username, String passwd, UGroup group, String ip, Enum<UStatus> status) {
+	static QueryResult insertNewClientLogin(String username, String passwd, UGroup group, String ip, UStatus status) {
 		String dml = "INSERT INTO `" + Tables.CLOGIN + "` "
 				+ "(`" + TLogin.Column.USERNAME + "`, `" + TLogin.Column.PASSWD + "`, `" + TLogin.Column.GROUP + "`,"
 				+ " `" + TLogin.Column.LASTACT + "`, `" + TLogin.Column.LASTIP + "`, `" + TLogin.Column.STATUS + "`) "
 				+ "VALUES "
 				+ "('" + username + "', AES_ENCRYPT('" + passwd + "','" + Database.KEY_STR + "'), '" + group + "',"
-				+ " NOW(), '" + ip + "', '" + status + "');";
+				+ " NOW(), '" + ip + "', '" + status.name() + "');";
 		String sql = "SELECT * FROM `" + Tables.CLOGIN + "` "
 			+ "WHERE `" + TLogin.Column.UID + "` = LAST_INSERT_ID();";
 		return Database.executeUpdateAndQuery(DB.CLIENTS, dml, sql);
 	}
 	
-	
+	/**
+	 * 
+	 * @param uid
+	 * @param firstname
+	 * @param lastname
+	 * @param email
+	 * @param cellphone
+	 * @param locale a String represent the locale name. e.g., "fr_FR".
+	 * @return
+	 */
 	static QueryResult insertNewClientInfo(long uid, String firstname, String lastname, 
 			String email, String cellphone, ULocale locale) {
 		
@@ -136,7 +148,7 @@ abstract class SqlQueryUtils extends Database {
 				+ " `" + TInfo.Column.EMAIL + "`, `" + TInfo.Column.CELLPHONE + "`, `" + TInfo.Column.LOCALE + "`) "
 				+ "VALUES "
 				+ "('" + uid + "', '" + firstname + "', '" + lastname + "',"
-				+ " " + email + ", " + cellphone + ", '" + locale + "');";
+				+ " " + email + ", " + cellphone + ", '" + locale.name() + "');";
 		String sql = "SELECT * FROM `" + Tables.CINFO + "` "
 			+ "WHERE `" + TInfo.Column.UID + "` = LAST_INSERT_ID();";
 		return Database.executeUpdateAndQuery(DB.CLIENTS, dml, sql);

@@ -3,11 +3,11 @@ com.google.gwt.user.client.rpc.IncompatibleRemoteServiceException, true, true, t
 com.google.gwt.user.client.rpc.RpcTokenException, true, true, false, false, com.google.gwt.user.client.rpc.RpcTokenException/2345075298, 2345075298
 com.google.gwt.user.client.rpc.XsrfToken, false, false, true, true, com.google.gwt.user.client.rpc.XsrfToken/4254043109, 4254043109
 com.pachatbot.myproject.client.SessionControl, false, false, false, false, _, 3814745805
-com.pachatbot.myproject.shared.Bean.Account, true, true, true, true, com.pachatbot.myproject.shared.Bean.Account/1081885577, 1081885577
+com.pachatbot.myproject.shared.Bean.Account, true, true, true, true, com.pachatbot.myproject.shared.Bean.Account/383402716, 383402716
 com.pachatbot.myproject.shared.PreDefined$TInfo$Column, false, false, true, true, com.pachatbot.myproject.shared.PreDefined$TInfo$Column/1097403227, 1097403227
-com.pachatbot.myproject.shared.PreDefined$UCivility, true, true, true, true, com.pachatbot.myproject.shared.PreDefined$UCivility/4115748237, 4115748237
+com.pachatbot.myproject.shared.PreDefined$UCivility, true, true, true, true, com.pachatbot.myproject.shared.PreDefined$UCivility/998320616, 998320616
 com.pachatbot.myproject.shared.PreDefined$UGroup, true, true, true, true, com.pachatbot.myproject.shared.PreDefined$UGroup/3900270532, 3900270532
-com.pachatbot.myproject.shared.PreDefined$ULocale, true, true, true, true, com.pachatbot.myproject.shared.PreDefined$ULocale/373813945, 373813945
+com.pachatbot.myproject.shared.PreDefined$ULocale, true, true, true, true, com.pachatbot.myproject.shared.PreDefined$ULocale/3369533572, 3369533572
 com.pachatbot.myproject.shared.PreDefined$UStatus, true, true, true, true, com.pachatbot.myproject.shared.PreDefined$UStatus/924467622, 924467622
 java.lang.Exception, true, false, true, false, java.lang.Exception/1920171873, 1920171873
 java.lang.RuntimeException, true, false, true, false, java.lang.RuntimeException/515124647, 515124647

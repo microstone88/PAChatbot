@@ -31,14 +31,10 @@ public class Test {
 //		System.out.println(timestamp);
 //		System.out.println(formatter.format(timestamp));
 		
-		String payPal = "abcdefghijklmn";
-		int tier = payPal.length()/3; int mid = payPal.length() - 2 * tier;
-		String cached = payPal.substring(0, tier);
-		for (int i = 0; i < mid; i++) {
-			cached += "*";
-		}
-		cached += payPal.substring(tier + mid);
-		System.out.println(cached);
+		
+		String str = "abcd";
+		System.out.println(str.equals(null));
+		
 
 //		QueryResult qrInfo = SqlQueryUtils.queryForClientInfoByPrimaryID(1);
 //		System.out.println(qrInfo);

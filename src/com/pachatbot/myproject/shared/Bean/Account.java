@@ -45,17 +45,16 @@ public class Account implements Serializable {
 	private String lastIP;
 	private Timestamp lastActive;
 	
+	private UGroup group;
 	private ULocale locale;
 	private UStatus status;
-	private UGroup group;
+	private UCivility civility;
 	
 	private String PayPal;
 	private String Alipay;
 	private String WeChat;
-	
-	private UCivility civility;
-	
-	
+
+	private int numOfIncoherents = 0;
 	
 //	private Locale javaLocale; // Need to customize the serialization (and it dosen't work!).
 	
@@ -91,7 +90,6 @@ public class Account implements Serializable {
 		return re;
 	}
 	
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -114,24 +112,53 @@ public class Account implements Serializable {
 				
 	}
 	
+	/**
+	 * 
+	 * @param column
+	 * @param value a String. e.g. "fr_FR".
+	 */
 	public void set(TInfo.Column column, String value) {
 		switch (column) {
 		case UID: this.setUid(Integer.valueOf(value)); break;
 		case FIRSTNAME: this.setFirstname(value); break;
 		case LASTNAME: this.setLastname(value); break;
-		case LOCALE: this.setLocale(ULocale.valueOf(value)); break;
 		case EMAIL: this.setEmail(value); break;
 		case CELLPHONE: this.setCellphone(value); break;
 		case PayPal: this.setPayPal(value); break;
 		case Alipay: this.setAlipay(value); break;
 		case WeChat: this.setWeChat(value); break;
-		case CIVILITY: this.setCivility(UCivility.valueOf(value)); break;
+		case LOCALE: 
+			if (value != null) this.setLocale(ULocale.valueOf(value)); break;
+		case CIVILITY: 
+			if (value != null) this.setCivility(UCivility.valueOf(value)); break;
 		default:
 			break;
 		}
 	}
 	
-	private String cache(String str) {
+	/**
+	 * 
+	 * @param column
+	 * @return a String. e.g., "French".
+	 */
+	public String get(TInfo.Column column) {
+		switch (column) {
+		case UID: return String.valueOf(this.getUid());
+		case FIRSTNAME: return this.getFirstname();
+		case LASTNAME: return this.getLastname();
+		case EMAIL: return this.getEmail();
+		case CELLPHONE: return this.getCellphone();
+		case PayPal: return this.getPayPal();
+		case Alipay: return this.getAlipay();
+		case WeChat: return this.getWeChat();
+		case LOCALE: return this.getLocale() != null ? this.getLocale().toString() : null;
+		case CIVILITY: return this.getCivility() != null ? this.getCivility().toString() : null;
+		default:
+			return null;
+		}
+	}
+	
+	public static String cache(String str) {
 		if (str != null) {
 			int tier = str.length() / 3;
 			int mid = str.length() - 2 * tier;
@@ -367,6 +394,20 @@ public class Account implements Serializable {
 	 */
 	public void setCivility(UCivility civility) {
 		this.civility = civility;
+	}
+
+	/**
+	 * @return the numOfIncoherents
+	 */
+	public int getNumOfIncoherents() {
+		return numOfIncoherents;
+	}
+
+	/**
+	 * @param numOfIncoherents the numOfIncoherents to set
+	 */
+	public void setNumOfIncoherents(int numOfIncoherents) {
+		this.numOfIncoherents = numOfIncoherents;
 	}
 
 //	/**
