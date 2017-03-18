@@ -115,7 +115,7 @@ public class Account implements Serializable {
 	/**
 	 * 
 	 * @param column
-	 * @param value a String. e.g. "fr_FR".
+	 * @param value a String or the name of a enum. e.g. "fr_FR".
 	 */
 	public void set(TInfo.Column column, String value) {
 		switch (column) {
@@ -128,9 +128,12 @@ public class Account implements Serializable {
 		case Alipay: this.setAlipay(value); break;
 		case WeChat: this.setWeChat(value); break;
 		case LOCALE: 
-			if (value != null) this.setLocale(ULocale.valueOf(value)); break;
+			if (value != null) this.setLocale(ULocale.valueOf(value)); 
+			break;
 		case CIVILITY: 
-			if (value != null) this.setCivility(UCivility.valueOf(value)); break;
+			if (value != null) this.setCivility(UCivility.valueOf(value));
+			else this.setCivility(UCivility.UNKNOWN);
+			break;
 		default:
 			break;
 		}
@@ -139,7 +142,7 @@ public class Account implements Serializable {
 	/**
 	 * 
 	 * @param column
-	 * @return a String. e.g., "French".
+	 * @return a String or the name of an enum. e.g., "fr_FR".
 	 */
 	public String get(TInfo.Column column) {
 		switch (column) {
@@ -151,8 +154,8 @@ public class Account implements Serializable {
 		case PayPal: return this.getPayPal();
 		case Alipay: return this.getAlipay();
 		case WeChat: return this.getWeChat();
-		case LOCALE: return this.getLocale() != null ? this.getLocale().toString() : null;
-		case CIVILITY: return this.getCivility() != null ? this.getCivility().toString() : null;
+		case LOCALE: return this.getLocale() != null ? this.getLocale().name() : null;
+		case CIVILITY: return this.getCivility() != null ? this.getCivility().name() : null;
 		default:
 			return null;
 		}

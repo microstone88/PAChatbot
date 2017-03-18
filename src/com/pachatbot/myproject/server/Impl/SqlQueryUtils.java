@@ -5,7 +5,7 @@ package com.pachatbot.myproject.server.Impl;
 
 import java.util.Locale;
 
-import com.pachatbot.myproject.server.QueryResult;
+import com.pachatbot.myproject.shared.Bean.QueryResult;
 import com.pachatbot.myproject.shared.PreDefined.TInfo;
 import com.pachatbot.myproject.shared.PreDefined.UGroup;
 import com.pachatbot.myproject.shared.PreDefined.ULocale;

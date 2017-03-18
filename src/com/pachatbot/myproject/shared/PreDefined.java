@@ -22,7 +22,7 @@ public abstract class PreDefined {
 	 *
 	 */
 	public enum ULocale implements Serializable {
-		Unknown (""), 
+
 		en_US ("English(US)"), en_GB ("English(UK)"), fr_FR ("French"), zh_CN ("Chinese");
 		
 		private String locale = "";
@@ -32,9 +32,10 @@ public abstract class PreDefined {
 	}
 	
 	public enum UCivility implements Serializable {
-		Unknown (""), Dr ("Dr."),
-		M ("M."), Mme ("Mme."), Mlle ("Mlle."), 
-		Mr ("Mr."), Mrs ("Mrs."), Ms ("Ms."), Miss ("Miss"); 
+		
+		UNKNOWN (""), DR ("Dr."),
+		M ("M."), MME ("Mme."), MLLE ("Mlle."), 
+		MR ("Mr."), MRS ("Mrs."), MS ("Ms."), MISS ("Miss"); 
 		
 		private String civility = "";
 		UCivility(String civility){this.civility = civility;}
@@ -45,13 +46,9 @@ public abstract class PreDefined {
 	
 	public abstract static class TInfo {
 		public enum Column {
-			
 			UNDEFINED ("undefined"),
-			
 			UID ("uid"), LOCALE ("locale"), CIVILITY ("civility"), FIRSTNAME ("first_name"), LASTNAME ("last_name"),
-			// Contact information
-			CELLPHONE ("cell"), EMAIL ("email"),
-			// Payment information
+			CODE ("phonecode"), CELLPHONE ("cell"), EMAIL ("email"),
 			WeChat ("wechat"), PayPal ("paypal"), Alipay ("alipay");
 			
 			private String colname = "";

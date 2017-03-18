@@ -56,6 +56,7 @@ import com.pachatbot.myproject.shared.FieldVerifier;
 import com.pachatbot.myproject.shared.PreDefined.TInfo;
 import com.pachatbot.myproject.shared.PreDefined.TInfo.Column;
 import com.pachatbot.myproject.shared.PreDefined.UCivility;
+import com.pachatbot.myproject.shared.PreDefined.UGroup;
 import com.pachatbot.myproject.shared.PreDefined.ULocale;
 import com.pachatbot.myproject.shared.StringUtils;
 import com.pachatbot.myproject.shared.Bean.Account;
@@ -104,7 +105,7 @@ public class PAChatbot implements EntryPoint {
 			"PayPal account", "Alipay account", "WeChat account"};
 	
 	private static final String[] EDITOR_CHECK_TEXT = {" e-mail address", " cellphone number",
-			" PayPal account", " Alipay account", " WeChat account"};
+			" PayPal ID", " Alipay ID", " WeChat ID"};
 	
 	/**
 	 * Animation duration configuration
@@ -162,9 +163,14 @@ public class PAChatbot implements EntryPoint {
 	 * Information labels
 	 */
 	final Label nameLabel = new Label("", false);
+	
+	final FlexTable accInfoTable = new FlexTable();
+	final Label label3 = new Label("User group:", false);
 	final Label userGroupLabel = new Label("", false);
+	
 	final Label lastActiveLabel = new Label("", false);
 	final Label lastIpAddrLabel = new Label("", false);
+	
 	final ListBox chooseCivility = new ListBox();
 	final ListBox chooseLanguage = new ListBox();
 	
@@ -398,7 +404,6 @@ public class PAChatbot implements EntryPoint {
 		myAccountHolder.setSpacing(2);
 		myAccountHolder.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		
-		final Label label3 = new Label("User group:", false);
 		final Label label4 = new Label("Last active:", false);
 		final Label label5 = new Label("Last IP:", false);
 		
@@ -418,14 +423,11 @@ public class PAChatbot implements EntryPoint {
 		signOutTableFormatter.setHorizontalAlignment(0, 1, 
 				HasHorizontalAlignment.ALIGN_RIGHT);
 		
-		final FlexTable accInfoTable = new FlexTable();
 		accInfoTable.setCellSpacing(6);
-		accInfoTable.setWidget(0, 0, label3);
-		accInfoTable.setWidget(0, 1, userGroupLabel);
-		accInfoTable.setWidget(1, 0, label4);
-		accInfoTable.setWidget(1, 1, lastActiveLabel);
-		accInfoTable.setWidget(2, 0, label5);
-		accInfoTable.setWidget(2, 1, lastIpAddrLabel);
+		accInfoTable.setWidget(0, 0, label4);
+		accInfoTable.setWidget(0, 1, lastActiveLabel);
+		accInfoTable.setWidget(1, 0, label5);
+		accInfoTable.setWidget(1, 1, lastIpAddrLabel);
 		
 		final PasswordTextBox ma_currentPwField = new PasswordTextBox();
 		ma_currentPwField.getElement().setAttribute("type", "text");
@@ -1290,6 +1292,7 @@ public class PAChatbot implements EntryPoint {
 			@Override
 			public void onChange(ChangeEvent event) {
 				String civil = chooseCivility.getSelectedValue();
+				if (civil.toLowerCase().equals("unknown")) civil = "NULL";
 				
 				final long uid = Integer.valueOf(Cookies.getCookie(COOKIE_NAME));
 				SessionControl.Utils.getInstance().update(uid, Column.CIVILITY, civil, 
@@ -1302,21 +1305,66 @@ public class PAChatbot implements EntryPoint {
 							loadLogoutSuccessfulView();
 							return;
 						}
-						
 						if (result.getUid() == uid) {
-							String msg = "Hi, " + result.getCivility().toString() + " "
-									+ nameLabel.getText() + "!";
+							String msg = "";
+							if (result.getCivility() != UCivility.UNKNOWN) {
+								String lastname = StringUtils.CapFstLetter(CURRENT_USER[1]);
+								msg = "Hello, " + result.getCivility().toString() + " " + lastname + "!";
+							} else msg = "Hi, " + CURRENT_USER[0] + "!";
 							displayReceivedMsgBubble(msg, 2*FADING_DELAY);
 						}
-						
 					}
-					
 					@Override
 					public void onFailure(Throwable caught) {
 						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
 					}
 				});
+			}
+		});
+		
+		chooseLanguage.addChangeHandler(new ChangeHandler() {
+			
+			@Override
+			public void onChange(ChangeEvent event) {
+				String lang = chooseLanguage.getSelectedValue();
 				
+				final long uid = Integer.valueOf(Cookies.getCookie(COOKIE_NAME));
+				SessionControl.Utils.getInstance().update(uid, Column.LOCALE, lang, 
+						new AsyncCallback<Account>() {
+					
+					@Override
+					public void onSuccess(Account result) {
+						if (result.getUid() == 0) {
+							displayReceivedMsgBubble("Server session expired! Please sign in again.", FADING_DELAY);
+							loadLogoutSuccessfulView();
+							return;
+						}
+						if (result.getUid() == uid) {
+							String msg = "";
+							switch (result.getLocale()) {
+							case fr_FR:
+								msg = "Bonjour! Je m'appelle Pi.";
+								break;
+							case zh_CN:
+								msg = "你好！请叫我小派。";
+								break;
+							case en_GB:
+								msg = "Hello! My name is Pi.";
+								break;
+							case en_US:
+								msg = "Hey, man! I'm Pi. What's up?";
+								break;
+							default:
+								break;
+							}
+							displayReceivedMsgBubble(msg, 2*FADING_DELAY);
+						}
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
+					}
+				});
 			}
 		});
 		
@@ -1512,6 +1560,15 @@ public class PAChatbot implements EntryPoint {
 		
 		userGroupLabel.setText(account.getGroup().toString());
 		
+		// Mask user group if not an administrator account
+		if (account.getGroup() != UGroup.admin) {
+			accInfoTable.removeRow(0);
+		} else {
+			accInfoTable.insertRow(0);
+			accInfoTable.setWidget(0, 0, label3);
+			accInfoTable.setWidget(0, 1, userGroupLabel);
+		}
+		
 		// Retrieve current user information
 		retrieveCurrentUser(account);
 		
@@ -1529,7 +1586,7 @@ public class PAChatbot implements EntryPoint {
 			if (CURRENT_USER[i+4] == EDITOR_DEFAULT_TEXT[i]) {
 				check.setText(" Add" + EDITOR_CHECK_TEXT[i]);
 				if (i < 2) check.setValue(true, true);
-			} else check.setText(" Edit" + EDITOR_CHECK_TEXT[i]);
+			} else check.setText(" Edit my" + EDITOR_CHECK_TEXT[i]);
 		}
 		
 		// Retrieve civility
@@ -1935,7 +1992,7 @@ public class PAChatbot implements EntryPoint {
 								default: 
 									info = "account"; break;
 								}
-								editCheck.setText(" Edit" + EDITOR_CHECK_TEXT[index]);
+								editCheck.setText(" Edit my" + EDITOR_CHECK_TEXT[index]);
 								displayReceivedMsgBubble("Your " + info 
 										+ " is now up-to-date.", FADING_DELAY);
 							}

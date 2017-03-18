@@ -8,7 +8,6 @@ import javax.servlet.http.HttpSession;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.pachatbot.myproject.client.SessionControl;
 import com.pachatbot.myproject.server.AccUtils;
-import com.pachatbot.myproject.server.QueryResult;
 import com.pachatbot.myproject.server.Impl.Database.TLogin;
 import com.pachatbot.myproject.shared.FieldVerifier;
 import com.pachatbot.myproject.shared.PreDefined.TInfo;
@@ -16,6 +15,7 @@ import com.pachatbot.myproject.shared.PreDefined.UGroup;
 import com.pachatbot.myproject.shared.PreDefined.ULocale;
 import com.pachatbot.myproject.shared.PreDefined.UStatus;
 import com.pachatbot.myproject.shared.Bean.Account;
+import com.pachatbot.myproject.shared.Bean.QueryResult;
 
 /**
  * @author micro
@@ -128,22 +128,11 @@ public class SessionControlImpl extends RemoteServiceServlet implements SessionC
 			re.setLastIP((String) qrLogin.getValue(1, TLogin.Column.LASTIP));
 			re.setStatus(UStatus.valueOf((String) qrLogin.getValue(1, TLogin.Column.STATUS)));
 			re.setGroup(UGroup.valueOf((String) qrLogin.getValue(1, TLogin.Column.GROUP)));
-			
 			AccUtils.updateAccountInfoFrom(qrInfo, re);
-			
-//			re.setFirstname((String) qrInfo.getValue(1, TInfo.Column.FIRSTNAME));
-//			re.setLastname((String) qrInfo.getValue(1, TInfo.Column.LASTNAME));
-//			re.setEmail((String) qrInfo.getValue(1, TInfo.Column.EMAIL));
-//			re.setCellphone((String) qrInfo.getValue(1, TInfo.Column.CELLPHONE));
-//			re.setLocale(ULocale.valueOf((String) qrInfo.getValue(1, TInfo.Column.LOCALE)));
 			
 			// Add payment information
 			QueryResult qr = SqlQueryUtils.queryForClientPaymentInfoByUID(uid_l);
 			AccUtils.updateAccountInfoFrom(qr, re);
-			
-//			re.setPayPal((String) qr.getValue(1, TInfo.Column.PayPal));
-//			re.setAlipay((String) qr.getValue(1, TInfo.Column.Alipay));
-//			re.setWeChat((String) qr.getValue(1, TInfo.Column.WeChat));
 			
 		}
 		else throw new IllegalArgumentException("uid dosen't match! login uid = " + uid_l + ", info uid = " + uid_i);

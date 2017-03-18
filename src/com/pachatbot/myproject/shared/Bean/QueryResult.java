@@ -1,12 +1,9 @@
 /**
  * 
  */
-package com.pachatbot.myproject.server;
+package com.pachatbot.myproject.shared.Bean;
 
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -64,35 +61,6 @@ public class QueryResult extends LinkedHashSet<LinkedHashMap<String, Object>> im
 			}
 			this.add(new_row);
 		}
-	}
-	
-	/**
-	 * Convert a given ResultSet object into a QueryResult object.
-	 * Note: Remember to set SQL statement that produced the ResultSet object.
-	 * 
-	 * @param resultSet a given ResultSet object
-	 * @throws SQLException
-	 */
-	public QueryResult(ResultSet resultSet) throws SQLException {
-		
-		if (resultSet == null)
-			throw new NullPointerException("trying to convert a null ResultSet object");
-		
-		// convert column names
-		ResultSetMetaData rsmd = resultSet.getMetaData();
-		int columnCount = rsmd.getColumnCount();
-		for (int c = 1; c <= columnCount; c++) {
-			columnNames.add(rsmd.getColumnName(c));
-		}
-
-		// convert rows
-		while (resultSet.next()) {
-			LinkedHashMap<String, Object> row = new LinkedHashMap<>(columnCount);
-			for (int c = 1; c <= columnCount; c++) {
-				row.put(this.getColumnName(c), resultSet.getObject(c));
-			}
-			this.add(row);
-		}		
 	}
 	
 	/**

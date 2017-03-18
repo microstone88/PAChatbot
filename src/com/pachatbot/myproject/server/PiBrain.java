@@ -5,6 +5,8 @@ package com.pachatbot.myproject.server;
 
 import java.util.Locale;
 
+import com.pachatbot.myproject.shared.Bean.QueryResult;
+
 /**
  * @author micro
  *
@@ -22,6 +24,10 @@ public abstract class PiBrain {
 		
 	}
 	
-	
+	public static void reduceAnswers(QueryResult qResult) {
+		//TODO reduce answers (server side)
+		
+		
+	}
 	
 }

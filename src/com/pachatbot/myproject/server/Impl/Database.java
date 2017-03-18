@@ -9,7 +9,8 @@ import java.sql.Statement;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 
-import com.pachatbot.myproject.server.QueryResult;
+import com.pachatbot.myproject.server.QResUtils;
+import com.pachatbot.myproject.shared.Bean.QueryResult;
 
 /**
  * @author micro
@@ -233,7 +234,7 @@ public abstract class Database {
 //			Connection conn = getJNDIConnection();
 			Statement stmt = conn.createStatement();
 		) {
-			re = new QueryResult(stmt.executeQuery(sql));
+			re = QResUtils.convertFrom(stmt.executeQuery(sql));
 		} catch (SQLException e) {
 			System.err.println("[ERROR] SQL query error occurred during \"" + sql + "\"");
 			e.printStackTrace();
@@ -289,7 +290,7 @@ public abstract class Database {
 			Statement stmt = conn.createStatement();
 		) {
 			count = stmt.executeUpdate(dml);
-			if (count == 1) re = new QueryResult(stmt.executeQuery(sql));
+			if (count == 1) re = QResUtils.convertFrom(stmt.executeQuery(sql));
 		} catch (SQLException e) {
 			System.err.println("[ERROR] SQL query error occurred during \"" + dml + sql + "\"");
 			e.printStackTrace();

@@ -4,10 +4,10 @@
 package com.pachatbot.myproject.server;
 
 import com.pachatbot.myproject.shared.PreDefined.TInfo;
-import com.pachatbot.myproject.shared.PreDefined.TInfo.Column;
 import com.pachatbot.myproject.shared.PreDefined.UCivility;
-import com.pachatbot.myproject.shared.PreDefined.ULocale;
+import com.pachatbot.myproject.shared.PreDefined.TInfo.Column;
 import com.pachatbot.myproject.shared.Bean.Account;
+import com.pachatbot.myproject.shared.Bean.QueryResult;
 
 /**
  * @author micro
@@ -29,6 +29,9 @@ public abstract class AccUtils {
 			case WeChat:
 				newStr = Account.cache(newStr);
 				break;
+			case CIVILITY:
+				if (newStr == null) newStr = UCivility.UNKNOWN.name();
+				break;
 			default:
 				break;
 			}
@@ -37,33 +40,9 @@ public abstract class AccUtils {
 				account.set(column, newStr);
 				if (newStr != null) return 1;
 			}
-			else {
-				switch (column) {
-				case LOCALE:
-					if (!account.get(column).toString().equals(
-							ULocale.valueOf(newStr).toString())) {
-						account.set(column, newStr);
-						return 1;
-					}
-					break;
-					
-				case CIVILITY:
-					if (!account.get(column).toString().equals(
-							UCivility.valueOf(newStr).toString())) {
-						account.set(column, newStr);
-						return 1;
-					}
-					break;
-
-				default:
-					if (!account.get(column).equals(newStr)) {
-						account.set(column, newStr);
-						return 1;
-					}
-					break;
-				}
-				
-				
+			else if (!account.get(column).equals(newStr)) {
+					account.set(column, newStr);
+					return 1;
 			}
 		}
 		return 0;

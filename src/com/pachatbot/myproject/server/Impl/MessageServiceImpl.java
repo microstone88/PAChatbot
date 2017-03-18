@@ -8,10 +8,10 @@ import java.util.Locale;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.pachatbot.myproject.client.MessageService;
 import com.pachatbot.myproject.server.PiBrain;
-import com.pachatbot.myproject.server.QueryResult;
 import com.pachatbot.myproject.server.Impl.Database.DB;
 import com.pachatbot.myproject.server.Impl.Database.Tables;
 import com.pachatbot.myproject.shared.Bean.Message;
+import com.pachatbot.myproject.shared.Bean.QueryResult;
 
 /**
  * @author micro
