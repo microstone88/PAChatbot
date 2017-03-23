@@ -5,10 +5,11 @@ package com.pachatbot.myproject.shared.Bean;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import com.pachatbot.myproject.shared.PreDefined.ULocale;
+
 import com.pachatbot.myproject.shared.PreDefined.TInfo;
 import com.pachatbot.myproject.shared.PreDefined.UCivility;
 import com.pachatbot.myproject.shared.PreDefined.UGroup;
+import com.pachatbot.myproject.shared.PreDefined.ULocale;
 import com.pachatbot.myproject.shared.PreDefined.UStatus;
 
 /**

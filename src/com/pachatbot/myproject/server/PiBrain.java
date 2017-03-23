@@ -12,9 +12,12 @@ import com.pachatbot.myproject.shared.Bean.QueryResult;
  *
  */
 public abstract class PiBrain {
-
+	
 	public static Locale detectLanguage(String question) {
 		//TODO auto-detect language
+		
+		
+		
 		return Locale.US;
 	}
 	

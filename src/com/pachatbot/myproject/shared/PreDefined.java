@@ -14,6 +14,7 @@ public abstract class PreDefined {
 		
 	}
 	
+	
 	/**
 	 * Due to some already known version issues, java.util.Locale object 
 	 * cannot be successfully serialized. Therefore, we use instead this 
@@ -43,8 +44,8 @@ public abstract class PreDefined {
 		public String toString(){return civility;}
 	}
 	
-	
 	public abstract static class TInfo {
+		
 		public enum Column {
 			UNDEFINED ("undefined"),
 			UID ("uid"), LOCALE ("locale"), CIVILITY ("civility"), FIRSTNAME ("first_name"), LASTNAME ("last_name"),
@@ -56,7 +57,7 @@ public abstract class PreDefined {
 			@Override
 			public String toString(){return colname;}
 		}
+		
 	}
-	
 	
 }

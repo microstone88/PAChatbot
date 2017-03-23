@@ -18,16 +18,17 @@ public interface SessionControl extends RemoteService {
 	
 	void logout(long uid);
 	
-	boolean changePassword(long uid, String oldPasswd, String newPasswd);
-	
     Account loginFromSessionServer(long uid);
     
     Account register(String firstname, String lastname, String email, String cellphone,
     		String username, String password);
     
+    UStatus checkUserStatus(Account account);
+    
+    boolean changePassword(long uid, String oldPasswd, String newPasswd);
+    
     Account update(long uid, TInfo.Column ref, String newStr);
     
-    UStatus checkUserStatus(Account account);
     
 	/**
 	 * Utility class for simplifying access to the instance of async service.

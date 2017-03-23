@@ -53,7 +53,6 @@ import com.pachatbot.myproject.client.UI.PopupConfirmBox;
 import com.pachatbot.myproject.client.animation.FadeAnimation;
 import com.pachatbot.myproject.client.animation.ScrollAnimation;
 import com.pachatbot.myproject.shared.FieldVerifier;
-import com.pachatbot.myproject.shared.PreDefined.TInfo;
 import com.pachatbot.myproject.shared.PreDefined.TInfo.Column;
 import com.pachatbot.myproject.shared.PreDefined.UCivility;
 import com.pachatbot.myproject.shared.PreDefined.UGroup;
@@ -184,6 +183,9 @@ public class PAChatbot implements EntryPoint {
 	 * For debugging
 	 */
 	final Label errorLabel = new Label();
+	
+	
+	private static boolean isSignedIn = false;
 	
 	/**
 	 * This is the entry point method.
@@ -375,7 +377,6 @@ public class PAChatbot implements EntryPoint {
 			updateTabs[i] = new VerticalPanel();
 			updateTabs[i].setSpacing(3);
 			updateTabs[i].add(editChecks[i]);
-			
 		}
 		
 		final Button op_removeButton = new Button("Remove Selected");
@@ -770,6 +771,8 @@ public class PAChatbot implements EntryPoint {
 		String userID = Cookies.getCookie(COOKIE_NAME);
 		if (userID == null) loadLogoutSuccessfulView();
 		else checkWithServerIfSessionIsStillLegal(Integer.valueOf(userID));
+		
+//		resetCurrentUser();
 
 		/**
 		 * Handling sending action triggered by either clicking "Send" 
@@ -807,14 +810,25 @@ public class PAChatbot implements EntryPoint {
 					
 					@Override
 					public void onSuccess(Message result) {
-						displayReceivedMsgBubble(result.getMessage());
+						String response = StringUtils.CapFstLetter(result.getMessage());
+						if (result.isGreeting()) {
+							if (isSignedIn()) {
+								if (CURRENT_USER[9].length() > 0) {
+									String lastname = StringUtils.CapFstLetter(CURRENT_USER[1]);
+									response += ", " + CURRENT_USER[9] + " " + lastname + "!";
+								} else response += ", " + CURRENT_USER[0] + "!";
+							}
+							else {
+								response += ", there!";
+							}
+						}
+						displayReceivedMsgBubble(response);
 						onceFinishSending();
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
 						displayReceivedMsgBubble(SERVER_ERROR);
-//						Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
 						onceFinishSending();
 					}
 				});
@@ -1215,7 +1229,6 @@ public class PAChatbot implements EntryPoint {
 			}
 		});
 		
-		
 		op_removeButton.addClickHandler(new ClickHandler() {
 			
 			@Override
@@ -1308,9 +1321,13 @@ public class PAChatbot implements EntryPoint {
 						if (result.getUid() == uid) {
 							String msg = "";
 							if (result.getCivility() != UCivility.UNKNOWN) {
+								CURRENT_USER[9] = result.getCivility().toString();
 								String lastname = StringUtils.CapFstLetter(CURRENT_USER[1]);
-								msg = "Hello, " + result.getCivility().toString() + " " + lastname + "!";
-							} else msg = "Hi, " + CURRENT_USER[0] + "!";
+								msg = "Hello, " + CURRENT_USER[9] + " " + lastname + "!";
+							} else {
+								CURRENT_USER[9] = "";
+								msg = "Hi, " + CURRENT_USER[0] + "!";
+							}
 							displayReceivedMsgBubble(msg, 2*FADING_DELAY);
 						}
 					}
@@ -1367,8 +1384,6 @@ public class PAChatbot implements EntryPoint {
 				});
 			}
 		});
-		
-		
 	}
 	
 	private void toggleShowPassword(PasswordTextBox passwdField) {
@@ -1377,78 +1392,6 @@ public class PAChatbot implements EntryPoint {
 			passwdField.getElement().setAttribute("type", "text");
 		if (currentType.contains("text"))
 			passwdField.getElement().setAttribute("type", "password");
-	}
-	
-	private void removeColumnFromDatabase(final int index) {
-		
-		final CheckBox editChk = (CheckBox) updateTabs[index].getWidget(0);
-		final Button updateBtn = (Button) updatePanels[index].getWidget(1);
-		
-		String newStr = "NULL";
-		TInfo.Column ref = Column.UNDEFINED;
-		switch (index) {
-		case 0: ref = Column.EMAIL;	break; 		// email address
-		case 1: ref = Column.CELLPHONE;	break; 	// cellphone number
-		case 2: ref = Column.PayPal; break; 	// PayPal account
-		case 3: ref = Column.Alipay; break;		// Alipay account
-		case 4: ref = Column.WeChat; break;		// WeChat account
-		default: break;	
-		}
-		final long uid = Integer.valueOf(Cookies.getCookie(COOKIE_NAME));
-		SessionControl.Utils.getInstance().update(
-				uid, ref, newStr, new AsyncCallback<Account>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(Account result) {
-				if (result.getUid() == 0) {
-					displayReceivedMsgBubble("Server session expired! Please sign in again.", FADING_DELAY);
-					loadLogoutSuccessfulView();
-					return;
-				}
-				
-				if (result.getUid() == uid) {
-					editChk.setValue(false, true);
-					updateBtn.setEnabled(false);
-					String msg = "";
-					switch (index) {
-					case 0: 
-						msg = "email address"; 
-						CURRENT_USER[4] = result.getEmail(); 
-						break;
-					case 1: 
-						msg = "cellphone number"; 
-						CURRENT_USER[5] = result.getCellphone();
-						break;
-					case 2: 
-						msg = "PayPal account";	
-						CURRENT_USER[6] = result.getPayPal();
-						break;
-					case 3: 
-						msg = "Alipay account";	
-						CURRENT_USER[7] = result.getAlipay();
-						break;
-					case 4: 
-						msg = "WeChat account";	
-						CURRENT_USER[8] = result.getWeChat();
-						break;
-					default: 
-						msg = "account"; break;
-					}
-					editChk.setText(" Add" + EDITOR_CHECK_TEXT[index]);
-					CURRENT_USER[index+4] = EDITOR_DEFAULT_TEXT[index];
-					displayReceivedMsgBubble("Your " + msg 
-							+ " is successfully removed.", FADING_DELAY);
-					
-					// Suggest to add the removed contact information
-					if (index < 2) editChk.setValue(true, true);
-				}
-			}
-		});
 	}
 	
 	private void resetSignInPanel(CheckBox showPwCheck, TextBox... fields) {
@@ -1509,12 +1452,18 @@ public class PAChatbot implements EntryPoint {
 	}
 	
 	private void resetCurrentUser() {
+		
+		setSignedIn(false);
+		
 		for (int i = 0; i < CURRENT_USER.length; i++) {
 			CURRENT_USER[i] = "";
 		}
 	}
 	
 	private void retrieveCurrentUser(Account account) {
+		
+		setSignedIn(true);
+		
 		if (account.getFirstname() != null) 
 			CURRENT_USER[0] = StringUtils.CapFstLetter(account.getFirstname());
 		else CURRENT_USER[0] = "";
@@ -1553,8 +1502,11 @@ public class PAChatbot implements EntryPoint {
 			CURRENT_USER[8] = account.getWeChat();
 		else CURRENT_USER[8] = EDITOR_DEFAULT_TEXT[4];
 		
+		if (account.getCivility() != UCivility.UNKNOWN)
+			CURRENT_USER[9] = account.getCivility().toString();
+		else CURRENT_USER[9] = "";
+		
 	}
-	
 	
 	private void loadLoginSuccessfulView(Account account) {
 		
@@ -1708,9 +1660,6 @@ public class PAChatbot implements EntryPoint {
 					public void run() {bubbleLayout.remove(receivedBubble);}
 				};
 				remover.schedule(MAX_FADING_DURATION);
-//				int h = receivedBubble.getOffsetHeight();
-//				int w = receivedBubble.getOffsetWidth();
-//				errorLabel.setText("Cell height = " + h + " Cell width = " + w);
 			}
 		};
 		timer.schedule(delay);
@@ -1921,7 +1870,7 @@ public class PAChatbot implements EntryPoint {
 						return;
 					}
 					
-					TInfo.Column ref = Column.UNDEFINED;
+					Column ref = Column.UNDEFINED;
 					switch (index) {
 					case 0: ref = Column.EMAIL;	break; 		// email address
 					case 1: ref = Column.CELLPHONE;	break; 	// cellphone number
@@ -2242,9 +2191,95 @@ public class PAChatbot implements EntryPoint {
 		return re;
 	}
 	
+	private void removeColumnFromDatabase(final int index) {
+		
+		final CheckBox editChk = (CheckBox) updateTabs[index].getWidget(0);
+		final Button updateBtn = (Button) updatePanels[index].getWidget(1);
+		
+		String newStr = "NULL";
+		Column ref = Column.UNDEFINED;
+		switch (index) {
+		case 0: ref = Column.EMAIL;	break; 		// email address
+		case 1: ref = Column.CELLPHONE;	break; 	// cellphone number
+		case 2: ref = Column.PayPal; break; 	// PayPal account
+		case 3: ref = Column.Alipay; break;		// Alipay account
+		case 4: ref = Column.WeChat; break;		// WeChat account
+		default: break;	
+		}
+		final long uid = Integer.valueOf(Cookies.getCookie(COOKIE_NAME));
+		SessionControl.Utils.getInstance().update(
+				uid, ref, newStr, new AsyncCallback<Account>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Window.alert(SERVER_ERROR + "\n" + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(Account result) {
+				if (result.getUid() == 0) {
+					displayReceivedMsgBubble("Server session expired! Please sign in again.", FADING_DELAY);
+					loadLogoutSuccessfulView();
+					return;
+				}
+				
+				if (result.getUid() == uid) {
+					editChk.setValue(false, true);
+					updateBtn.setEnabled(false);
+					String msg = "";
+					switch (index) {
+					case 0: 
+						msg = "email address"; 
+						CURRENT_USER[4] = result.getEmail(); 
+						break;
+					case 1: 
+						msg = "cellphone number"; 
+						CURRENT_USER[5] = result.getCellphone();
+						break;
+					case 2: 
+						msg = "PayPal account";	
+						CURRENT_USER[6] = result.getPayPal();
+						break;
+					case 3: 
+						msg = "Alipay account";	
+						CURRENT_USER[7] = result.getAlipay();
+						break;
+					case 4: 
+						msg = "WeChat account";	
+						CURRENT_USER[8] = result.getWeChat();
+						break;
+					default: 
+						msg = "account"; break;
+					}
+					editChk.setText(" Add" + EDITOR_CHECK_TEXT[index]);
+					CURRENT_USER[index+4] = EDITOR_DEFAULT_TEXT[index];
+					displayReceivedMsgBubble("Your " + msg 
+							+ " is successfully removed.", FADING_DELAY);
+					
+					// Suggest to add the removed contact information
+					if (index < 2) editChk.setValue(true, true);
+				}
+			}
+		});
+	}
+	
 	
 	private HTML newHTMLSplitLine(String width) {
 		return new HTML("<hr width = \"" + width + "\" size=\"3\" color=\"#62b0ff\" noshade>");
+	}
+
+	/**
+	 * @return the isSignedIn
+	 */
+	public static boolean isSignedIn() {
+		return isSignedIn;
+	}
+
+	/**
+	 * @param isSignedIn the isSignedIn to set
+	 */
+	public static void setSignedIn(boolean isSignedIn) {
+		PAChatbot.isSignedIn = isSignedIn;
 	}
 	
 	

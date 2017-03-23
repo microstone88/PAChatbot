@@ -26,7 +26,7 @@
     <url-pattern>/pachatbot/MessageService</url-pattern>
   </servlet-mapping>
   
-    <servlet>
+  <servlet>
     <servlet-name>sessionServlet</servlet-name>
     <servlet-class>com.pachatbot.myproject.server.Impl.SessionControlImpl</servlet-class>
   </servlet>
@@ -35,6 +35,7 @@
     <servlet-name>sessionServlet</servlet-name>
     <url-pattern>/pachatbot/SessionControl</url-pattern>
   </servlet-mapping>
+  
   
   <!-- Default page to serve -->
   <welcome-file-list>
